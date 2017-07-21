@@ -17,18 +17,17 @@ import org.junit.Test;
 public class UniqueIdMultiThreadTest {
 	public static int count = 1000000;
 	public static int threads = 10;
-	
-	private List<Set> list=new ArrayList<Set>();
-	
+
+	private List<Set> list = new ArrayList<Set>();
+
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		
+
 	}
 
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
-		
-		
+
 	}
 
 	@Before
@@ -38,21 +37,22 @@ public class UniqueIdMultiThreadTest {
 	@After
 	public void tearDown() throws Exception {
 	}
+
 	@Test
 	public void test() {
-		Set set=new HashSet(threads*count);
-		for(int i=0;i<threads;i++) {
-			Thread t1=new Thread(new Runnable() {
+		Set set = new HashSet(threads * count);
+		for (int i = 0; i < threads; i++) {
+			Thread t1 = new Thread(new Runnable() {
 
 				@Override
 				public void run() {
 					runtest();
 				}
-				
+
 			});
 			t1.start();
 		}
-		while(list.size()!=threads) {
+		while (list.size() != threads) {
 			System.err.print(list.size());
 			try {
 				Thread.sleep(1000);
@@ -62,23 +62,20 @@ public class UniqueIdMultiThreadTest {
 			}
 		}
 		System.err.println("");
-		for(Set s:list) {
+		for (Set s : list) {
 			set.addAll(s);
 		}
-		System.err.println("--------------"+(set.size()==threads*count));
+		System.err.println("--------------" + (set.size() == threads * count));
 	}
 
-
-	
 	public Set runtest() {
 		// check length
 		String uniqueId20 = null;
-		
+
 		for (int i = 0; i < count; i++) {
 			uniqueId20 = UniqueId.get().toBase64String();
 			Assert.assertTrue("not 20 character id:" + uniqueId20, 20 == uniqueId20.length());
 		}
-
 
 		// check performance single thread
 		long begin = System.currentTimeMillis();
@@ -92,27 +89,27 @@ public class UniqueIdMultiThreadTest {
 
 		// check encode decode safety
 		String uniqueId30 = null;
-		UniqueId uniqueId = UniqueId.get();
+		UniqueId uniqueId = null;
 		for (int i = 0; i < count; i++) {
+			uniqueId = UniqueId.get();
 			uniqueId30 = uniqueId.toHexString();
 			uniqueId20 = uniqueId.toBase64String();
-			Assert.assertTrue("Unsafe Base64 encode and decode, original id:" + i+" "+  uniqueId30,
+			Assert.assertTrue("Unsafe Base64 encode and decode, original id:" + i + " " + uniqueId30,
 					uniqueId30.equals(UniqueId.fromBase64String(uniqueId20).toHexString()));
 		}
-		Set set=new HashSet(count);
+		Set set = new HashSet(count);
 		for (int i = 0; i < count; i++) {
 
 			uniqueId20 = UniqueId.get().toBase64String();
 			set.add(uniqueId20);
 		}
 		int size = set.size();
-		//set.clear();
+		// set.clear();
 		Assert.assertTrue("Duplicated key found in originalId set." + uniqueId20, size == count);
-		synchronized(list) {
+		synchronized (list) {
 			list.add(set);
 		}
-		
-		
+
 		return set;
 	}
 }

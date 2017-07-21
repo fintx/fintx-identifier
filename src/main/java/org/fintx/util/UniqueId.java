@@ -69,10 +69,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Limitations:
  * </p>
  * <p>
- * ProcessId on os could not bigger then 65535.
- * Only in one bundle of same JVM when using OSGI.
- * Id requirement could not more then aberr 800 million per second per JVM.
- * This could be using for 20 years since 20170601.
+ * ProcessId on os could not bigger then 65535. Only in one bundle of same JVM
+ * when using OSGI. Id requirement could not more then aberr 800 million per
+ * second per JVM. This could be using for 20 years since 20170601.
  * </p>
  *
  */
@@ -192,7 +191,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
 	private UniqueId(final int timestamp, final long machineIdentifier, final short processIdentifier,
 			final int counter, final boolean checkCounter) {
 		int lastTimestamp = LAST_TIMESTAMP.get();
-		if (timestamp - lastTimestamp > 0) { //once per second
+		if (timestamp - lastTimestamp > 0) { // once per second
 			synchronized (LAST_TIMESTAMP) {
 				if (timestamp > LAST_TIMESTAMP.get()) {
 					LAST_TIMESTAMP.addAndGet(timestamp - LAST_TIMESTAMP.get());
@@ -355,14 +354,14 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
 		}
 		return new String(chars);
 	}
-	
+
 	/**
 	 * Converts this instance into a 30-byte hexadecimal string representation.
 	 *
 	 * @return a string representation of the UniqueId in hexadecimal format
 	 */
 	private static String toHexString(byte[] bytes) {
-		char[] chars = new char[bytes.length*2];
+		char[] chars = new char[bytes.length * 2];
 		int i = 0;
 		for (byte b : bytes) {
 			chars[i++] = HEX_CHARS[b >> 4 & 0xF];
@@ -452,10 +451,12 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
 			Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
 			while (e.hasMoreElements()) {
 				NetworkInterface ni = e.nextElement();
-				if(!ni.isLoopback()) {
+				if (!ni.isLoopback()) {
 					mac = ni.getHardwareAddress();
-				};
-				if (mac != null && mac.length == 6 && mac[1] != (byte) 0xff ) {//?? mac[1] != (byte) 0xff it is from http://johannburkard.de/software/uuid/
+				}
+				;
+				if (mac != null && mac.length == 6 && mac[1] != (byte) 0xff) {// ?? mac[1] != (byte) 0xff it is from
+																				// http://johannburkard.de/software/uuid/
 					break;
 				} else {
 					continue;
@@ -466,7 +467,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
 		if (mac != null && mac.length == 6 && mac[1] != (byte) 0xff) {
 			return bytes2long(mac);
 		} else {
-			throw new RuntimeException("MAC address is not correct:"+toHexString(mac));
+			throw new RuntimeException("MAC address is not correct:" + toHexString(mac));
 		}
 
 	}
@@ -527,8 +528,8 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
 	}
 
 	private static int bytes2int(byte[] byteNum) {
-		if(byteNum.length>4) {
-			throw new RuntimeException("byteNum is too long for a int type:"+byteNum.length);
+		if (byteNum.length > 4) {
+			throw new RuntimeException("byteNum is too long for a int type:" + byteNum.length);
 		}
 		int num = 0;
 		for (int ix = 0; ix < byteNum.length; ++ix) {
@@ -548,8 +549,8 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
 	}
 
 	private static long bytes2long(byte[] byteNum) {
-		if(byteNum.length>8) {
-			throw new RuntimeException("byteNum is too long for a long type:"+byteNum.length);
+		if (byteNum.length > 8) {
+			throw new RuntimeException("byteNum is too long for a long type:" + byteNum.length);
 		}
 		long num = 0;
 		for (int ix = 0; ix < byteNum.length; ++ix) {
@@ -559,30 +560,31 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
 		}
 		return num;
 	}
-	
+
 	public static void main(String[] args) {
-		
-		System.err.println(System.currentTimeMillis()/1000L);
-		System.err.println((2147483647-System.currentTimeMillis()/1000L));
-		System.err.println("Still working years:"+(2147483647-System.currentTimeMillis()/1000L)/((System.currentTimeMillis()/1000L)/(new Date().getYear()-70)));
-		long l=12345678901223322L;
+
+		System.err.println(System.currentTimeMillis() / 1000L);
+		System.err.println((2147483647 - System.currentTimeMillis() / 1000L));
+		System.err.println("Still working years:" + (2147483647 - System.currentTimeMillis() / 1000L)
+				/ ((System.currentTimeMillis() / 1000L) / (new Date().getYear() - 70)));
+		long l = 12345678901223322L;
 		System.err.println(Long.toBinaryString(l));
-		byte[] bytes=long2bytes(l);
-		l=bytes2long(bytes);
+		byte[] bytes = long2bytes(l);
+		l = bytes2long(bytes);
 		System.err.println(Long.toBinaryString(l));
-		
-		int i=1500617485;
+
+		int i = 1500617485;
 		System.err.println(Integer.toBinaryString(i));
-		bytes=int2bytes(i);
-		l=bytes2int(bytes);
+		bytes = int2bytes(i);
+		l = bytes2int(bytes);
 		System.err.println(Long.toBinaryString(i));
-		UniqueId uniqueId=UniqueId.get();
+		UniqueId uniqueId = UniqueId.get();
 		System.err.println("-------------------------------");
 		System.err.println(uniqueId.getTimestamp());
 		System.err.println(uniqueId.getMachineIdentifier());
 		System.err.println(uniqueId.getProcessIdentifier());
 		System.err.println(uniqueId.getCounter());
-		uniqueId=UniqueId.fromHexString(uniqueId.toHexString());
+		uniqueId = UniqueId.fromHexString(uniqueId.toHexString());
 		System.err.println("-------------------------------");
 		System.err.println(uniqueId.getTimestamp());
 		System.err.println(uniqueId.getMachineIdentifier());
