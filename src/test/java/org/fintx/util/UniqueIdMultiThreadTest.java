@@ -1,7 +1,5 @@
 package org.fintx.util;
 
-import static org.junit.Assert.*;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -15,101 +13,110 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class UniqueIdMultiThreadTest {
-	public static int count = 1000000;
-	public static int threads = 10;
+    public static int count = 1000000;
+    public static int threads = 10;
 
-	private List<Set> list = new ArrayList<Set>();
+    private List<Set<String>> list = new ArrayList<Set<String>>();
 
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
 
-	}
+    }
 
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception {
 
-	}
+    }
 
-	@Before
-	public void setUp() throws Exception {
-	}
+    @Before
+    public void setUp() throws Exception {
+    }
 
-	@After
-	public void tearDown() throws Exception {
-	}
+    @After
+    public void tearDown() throws Exception {
+    }
 
-	@Test
-	public void test() {
-		Set set = new HashSet(threads * count);
-		for (int i = 0; i < threads; i++) {
-			Thread t1 = new Thread(new Runnable() {
+    @Test
+    public void test() {
+        Set set = new HashSet(threads * count);
+        for (int i = 0; i < threads; i++) {
+            Thread t1 = new Thread(new Runnable() {
 
-				@Override
-				public void run() {
-					runtest();
-				}
+                @Override
+                public void run() {
+                    runtest();
+                }
 
-			});
-			t1.start();
-		}
-		while (list.size() != threads) {
-			System.err.print(list.size());
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		System.err.println("");
-		for (Set s : list) {
-			set.addAll(s);
-		}
-		System.err.println("--------------" + (set.size() == threads * count));
-	}
+            });
+            t1.start();
+        }
+        while (list.size() != threads) {
+            System.err.print(list.size());
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            
+        }
+        System.err.println("");
+        for (int i=0;i<threads ;i++) {
+            set.addAll(list.get(0));
+            list.remove(0);
+        }
+        System.err.println("--------------" + (set.size() == threads * count));
+    }
 
-	public Set runtest() {
-		// check length
-		String uniqueId20 = null;
+    public Set<String> runtest() {
+        // check length
+        String uniqueId20 = null;
 
-		for (int i = 0; i < count; i++) {
-			uniqueId20 = UniqueId.get().toBase64String();
-			Assert.assertTrue("not 20 character id:" + uniqueId20, 20 == uniqueId20.length());
-		}
+        for (int i = 0; i < count; i++) {
+            uniqueId20 = UniqueId.get().toBase64String();
+            Assert.assertTrue("not 20 character id:" + uniqueId20, 20 == uniqueId20.length());
+        }
 
-		// check performance single thread
-		long begin = System.currentTimeMillis();
-		for (int i = 0; i < count; i++) {
-			uniqueId20 = UniqueId.get().toBase64String();
-		}
-		long end = System.currentTimeMillis();
-		System.out.println(
-				"Base64 ID generation total milliseconds:" + (end - begin) + " total seconds:" + (end - begin) / 1000);
-		System.out.println("Base64 ID generation QPMS:" + count / ((end - begin)));
+        // check performance single thread
+        long begin = System.currentTimeMillis();
+        for (int i = 0; i < count; i++) {
+            uniqueId20 = UniqueId.get().toBase64String();
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("Base64 ID generation total milliseconds:" + (end - begin) + " total seconds:" + (end - begin) / 1000);
+        System.out.println("Base64 ID generation QPS:" + count * 1000L / ((end - begin + 1)));
 
-		// check encode decode safety
-		String uniqueId30 = null;
-		UniqueId uniqueId = null;
-		for (int i = 0; i < count; i++) {
-			uniqueId = UniqueId.get();
-			uniqueId30 = uniqueId.toHexString();
-			uniqueId20 = uniqueId.toBase64String();
-			Assert.assertTrue("Unsafe Base64 encode and decode, original id:" + i + " " + uniqueId30,
-					uniqueId30.equals(UniqueId.fromBase64String(uniqueId20).toHexString()));
-		}
-		Set set = new HashSet(count);
-		for (int i = 0; i < count; i++) {
+        // check encode decode safety
+        String uniqueId30 = null;
+        UniqueId uniqueId = null;
+        for (int i = 0; i < count; i++) {
+            uniqueId = UniqueId.get();
+            uniqueId30 = uniqueId.toHexString();
+            uniqueId20 = uniqueId.toBase64String();
+            Assert.assertTrue("Unsafe Base64 encode and decode, original id:" + i + " " + uniqueId30,
+                    uniqueId30.equals(UniqueId.fromBase64String(uniqueId20).toHexString()));
+            Assert.assertTrue("Unsafe Base64 encode and decode, original id:" + i + " " + uniqueId30,
+                    UniqueId.fromHexString(uniqueId30).getTimestamp()==UniqueId.fromBase64String(uniqueId20).getTimestamp());
+            Assert.assertTrue("Unsafe Base64 encode and decode, original id:" + i + " " + uniqueId30,
+                    UniqueId.fromHexString(uniqueId30).getMachineIdentifier()==UniqueId.fromBase64String(uniqueId20).getMachineIdentifier());
+            Assert.assertTrue("Unsafe Base64 encode and decode, original id:" + i + " " + uniqueId30,
+                    UniqueId.fromHexString(uniqueId30).getProcessIdentifier()==UniqueId.fromBase64String(uniqueId20).getProcessIdentifier());
+            Assert.assertTrue("Unsafe Base64 encode and decode, original id:" + i + " " + uniqueId30,
+                    UniqueId.fromHexString(uniqueId30).getCounter()==UniqueId.fromBase64String(uniqueId20).getCounter());
+        }
+        Set<String> set = new HashSet<String>(count);
+        for (int i = 0; i < count; i++) {
 
-			uniqueId20 = UniqueId.get().toBase64String();
-			set.add(uniqueId20);
-		}
-		int size = set.size();
-		// set.clear();
-		Assert.assertTrue("Duplicated key found in originalId set." + uniqueId20, size == count);
-		synchronized (list) {
-			list.add(set);
-		}
+            uniqueId20 = UniqueId.get().toBase64String();
+            set.add(uniqueId20);
+        }
+        int size = set.size();
+        // set.clear();
+        Assert.assertTrue("Duplicated key found in originalId set." + uniqueId20, size == count);
+        synchronized (list) {
+            list.add(set);
+        }
 
-		return set;
-	}
+        return set;
+    }
 }
