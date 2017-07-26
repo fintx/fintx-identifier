@@ -13,8 +13,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class UniqueIdMultiThreadTest {
-    public static int count = 1000000;
-    public static int threads = 10;
+    public int count = 2000000;
+    public int threads = 8;
+    public boolean error = false;
 
     private List<Set<String>> list = new ArrayList<Set<String>>();
 
@@ -44,13 +45,19 @@ public class UniqueIdMultiThreadTest {
 
                 @Override
                 public void run() {
-                    runtest();
+                    try {
+                        runtest();
+                    }catch (Throwable t) {
+                        t.printStackTrace();
+                        error=true;
+                    }
+                    
                 }
 
             });
             t1.start();
         }
-        while (list.size() != threads) {
+        while ((list.size() != threads)&&!error) {
             System.err.print(list.size());
             try {
                 Thread.sleep(1000);
@@ -65,7 +72,7 @@ public class UniqueIdMultiThreadTest {
             set.addAll(list.get(0));
             list.remove(0);
         }
-        System.err.println("--------------" + (set.size() == threads * count));
+        System.err.println("The id number sum compare result:"+(set.size() == threads * count));
     }
 
     public Set<String> runtest() {
@@ -96,13 +103,13 @@ public class UniqueIdMultiThreadTest {
             Assert.assertTrue("Unsafe Base64 encode and decode, original id:" + i + " " + uniqueId30,
                     uniqueId30.equals(UniqueId.fromBase64String(uniqueId20).toHexString()));
             Assert.assertTrue("Unsafe Base64 encode and decode, original id:" + i + " " + uniqueId30,
-                    UniqueId.fromHexString(uniqueId30).getTimestamp()==UniqueId.fromBase64String(uniqueId20).getTimestamp());
+                    UniqueId.fromHexString(uniqueId30).getTimestamp() == UniqueId.fromBase64String(uniqueId20).getTimestamp());
             Assert.assertTrue("Unsafe Base64 encode and decode, original id:" + i + " " + uniqueId30,
-                    UniqueId.fromHexString(uniqueId30).getMachineIdentifier()==UniqueId.fromBase64String(uniqueId20).getMachineIdentifier());
+                    UniqueId.fromHexString(uniqueId30).getMachineIdentifier() == UniqueId.fromBase64String(uniqueId20).getMachineIdentifier());
             Assert.assertTrue("Unsafe Base64 encode and decode, original id:" + i + " " + uniqueId30,
-                    UniqueId.fromHexString(uniqueId30).getProcessIdentifier()==UniqueId.fromBase64String(uniqueId20).getProcessIdentifier());
+                    UniqueId.fromHexString(uniqueId30).getProcessIdentifier() == UniqueId.fromBase64String(uniqueId20).getProcessIdentifier());
             Assert.assertTrue("Unsafe Base64 encode and decode, original id:" + i + " " + uniqueId30,
-                    UniqueId.fromHexString(uniqueId30).getCounter()==UniqueId.fromBase64String(uniqueId20).getCounter());
+                    UniqueId.fromHexString(uniqueId30).getCounter() == UniqueId.fromBase64String(uniqueId20).getCounter());
         }
         Set<String> set = new HashSet<String>(count);
         for (int i = 0; i < count; i++) {
