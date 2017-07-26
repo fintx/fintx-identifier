@@ -1,15 +1,15 @@
-/*
- * Copyright (c) 2008-2014 MongoDB, Inc.
+/**
+ *  Copyright 2017 FinTx
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHerr WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -49,10 +49,13 @@ import java.util.concurrent.atomic.AtomicLong;
  * <td>9</td>
  * <td>10</td>
  * <td>11</td>
+ * <td>12</td>
+ * <td>13</td>
+ * <td>14</td>
  * </tr>
  * <tr>
  * <td colspan="4">time</td>
- * <td colspan="3">machine</td>
+ * <td colspan="6">machine</td>
  * <td colspan="2">pid</td>
  * <td colspan="3">inc</td>
  * </tr>
@@ -180,25 +183,47 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
 
     private UniqueId(final int timestamp, final long machineIdentifier, final short processIdentifier, final int counter,
             final boolean checkCounter) {
-        Long lastTimestamp = LAST_TIMESTAMP.get();
-        // once per second
-        if (((timestamp & 0xffffffffL) - (lastTimestamp & 0xffffffffL)) > 0) {
+        long current = LAST_TIMESTAMP.get();
+
+        if (((timestamp & 0xffffffffL) == (current & 0xffffffffL))) {
+        // @formatter:off
+        // mostly   
+        // @formatter:on
+
+            // Do nothing
+
+        } else if (((timestamp & 0xffffffffL) > (current & 0xffffffffL))) {
+        // @formatter:off
+        // once per second or less
+        // @formatter:on    
             synchronized (LAST_TIMESTAMP) {
-                if (timestamp > LAST_TIMESTAMP.get()) {
-                    LAST_TIMESTAMP.addAndGet((timestamp & 0xffffffffL) - (LAST_TIMESTAMP.get() & 0xffffffffL));
+                if ((timestamp & 0xffffffffL) > (LAST_TIMESTAMP.get() & 0xffffffffL)) {
+                    current = LAST_TIMESTAMP.addAndGet((timestamp & 0xffffffffL) - (LAST_TIMESTAMP.get() & 0xffffffffL));
                 }
             }
+
+        } else {
         // @formatter:off
+        //((timestamp & 0xffffffffL) < (current & 0xffffffffL))
         // hardly
-        // @formatter:on
-        } else if (((timestamp & 0xffffffffL) - (lastTimestamp & 0xffffffffL)) < -1) {
+        // @formatter:on    
             synchronized (LAST_TIMESTAMP) {
-                // timestamp is in the new round of zero to 0xffffffffL. 0x7fffffffL is half of 0xffffffffL.
-                // A round is about 69 years, so the gap between last timestamp in the last round and new timestamp in
-                // this round will not less then 34 years
-                if ((LAST_TIMESTAMP.get() & 0xffffffffL - (timestamp & 0xffffffffL)) >= 0x7fffffffL) {
-                    LAST_TIMESTAMP.set(timestamp);
+                if (((LAST_TIMESTAMP.get() & 0xffffffffL) - (timestamp & 0xffffffffL)) == 1L) {
+                // @formatter:off
+                // LAST_TIMESTAMP increased after timestamp generated
+                // @formatter:on  
+                    // Do nothing
+                } else if (((LAST_TIMESTAMP.get() & 0xffffffffL) - (timestamp & 0xffffffffL)) >= 0x7fffffffL) {
+                    // timestamp is in the new round of zero to 0xffffffffL. 0x7fffffffL is half of 0xffffffffL.
+                    // A round is about 69 years, so the gap between last timestamp in the last round and new timestamp
+                    // in this round will not less then 34 years
+                    LAST_TIMESTAMP.set(timestamp & 0xffffffffL);
+                    current = (timestamp & 0xffffffffL);
                 } else {
+                    System.err.println(((LAST_TIMESTAMP.get() & 0xffffffffL) - (timestamp & 0xffffffffL)));
+                    System.err.println(timestamp);
+                    System.err.println(current);
+                    System.err.println(LAST_TIMESTAMP.get());
                     throw new IllegalArgumentException(
                             "The timestamp must not be less then the timestamp last time. (Maybe the machine correct time using time server).");
                 }
@@ -210,7 +235,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
         if (checkCounter && ((counter & 0xff000000) != 0)) {
             throw new IllegalArgumentException("The counter must be between 0 and 16777215 (it must fit in three bytes).");
         }
-        this.timestamp = timestamp;
+        this.timestamp = (int) current;
         this.machineIdentifier = machineIdentifier;
         this.processIdentifier = processIdentifier;
         this.counter = counter & LOW_ORDER_THREE_BYTES;
@@ -309,7 +334,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
      * @return the process identifier
      */
     public int getProcessIdentifier() {
-        return processIdentifier & 0x0FFFF;
+        return processIdentifier & 0x0ffff;
     }
 
     /**
@@ -527,7 +552,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     }
 
     private static int dateToTimestampSeconds(final Date time) {
-        return (int) ((time.getTime() / 1000L) & 0xffffffff);
+        return (int) ((time.getTime() / 1000L) & 0xffffffffL);
     }
 
     private static byte[] int2bytes(int num) {
@@ -576,21 +601,24 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
         return num;
     }
 
-    // // Test for some extreme condition
+    // Test for some extreme condition
     // public static void main(String[] args) {
     // UniqueId uniqueId = null;
-    //// for (long lo = new Date().getTime(); lo < Long.MAX_VALUE; lo++) {
-    ////
-    //// uniqueId = new UniqueId(dateToTimestampSeconds(new Date(lo / 1000L * 1000L)), MACHINE_IDENTIFIER,
+    // for (long lo = new Date().getTime(); lo < Long.MAX_VALUE; lo++) {
+    // uniqueId = new UniqueId(dateToTimestampSeconds(new Date(lo / 1000L * 1000L)), MACHINE_IDENTIFIER,
     // PROCESS_IDENTIFIER,
-    //// NEXT_COUNTER.getAndIncrement(), false);
-    //// if (!uniqueId.getDate(lo).toString().equals(new Date(lo / 1000L * 1000L).toString())) {
-    //// System.err.println("XXXXXXXXXXXXXXXXXXXXXXXXXXLo:" + lo);
-    //// System.err.println(uniqueId.getDate(lo).toString());
-    //// System.err.println(new Date(lo / 1000L * 1000L).toString());
-    //// throw new RuntimeException();
-    //// }
-    //// }
+    // NEXT_COUNTER.getAndIncrement(), false);
+    // if (!uniqueId.getDate(lo).toString().equals(new Date(lo / 1000L * 1000L).toString())) {
+    // System.err.println("XXXXXXXXXXXXXXXXXXXXXXXXXXLo:" + lo);
+    // System.err.println(uniqueId.getDate(lo).toString());
+    // System.err.println(new Date(lo / 1000L * 1000L).toString());
+    // throw new RuntimeException();
+    // }
+    // if (lo % 100000000 == 0) {
+    // System.err.println(lo);
+    // System.err.println(uniqueId.getDate(lo).toString());
+    // }
+    // }
     // System.err.println("-------------------------------1");
     // long l = 12345678901223322L;
     // System.err.println(Long.toBinaryString(l));
@@ -638,7 +666,8 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     // System.err.println(dateToTimestampSeconds(new Date(0xfffffffeL * 1000L)));
     // System.err.println(Long.toBinaryString(dateToTimestampSeconds(new Date(0xfffffffeL * 1000L))));
     // System.err.println(Integer.toBinaryString((int) dateToTimestampSeconds(new Date(0xfffffffeL * 1000L))));
-    // uid = new UniqueId(dateToTimestampSeconds(new Date(0xfffffffeL * 1000L)), MACHINE_IDENTIFIER, PROCESS_IDENTIFIER,
+    // uid = new UniqueId(dateToTimestampSeconds(new Date(0xfffffffeL * 1000L)), MACHINE_IDENTIFIER,
+    // PROCESS_IDENTIFIER,
     // NEXT_COUNTER.getAndIncrement(), false);
     // System.err.println(uid.getDate(0xfffffffeL * 1000L).toString());
     // System.err.println(uid.getTimestamp());
@@ -648,13 +677,15 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     // System.err.println(dateToTimestampSeconds(new Date(0xffffffffL * 1000L)));
     // System.err.println(Long.toBinaryString(dateToTimestampSeconds(new Date(0xffffffffL * 1000L))));
     // System.err.println(Integer.toBinaryString((int) dateToTimestampSeconds(new Date(0xffffffffL * 1000L))));
-    // uid = new UniqueId(dateToTimestampSeconds(new Date(0xffffffffL * 1000L)), MACHINE_IDENTIFIER, PROCESS_IDENTIFIER,
+    // uid = new UniqueId(dateToTimestampSeconds(new Date(0xffffffffL * 1000L)), MACHINE_IDENTIFIER,
+    // PROCESS_IDENTIFIER,
     // NEXT_COUNTER.getAndIncrement(), false);
     // System.err.println(uid.getDate(0xffffffffL * 1000L).toString());
     // System.err.println(uid.getTimestamp());
     // System.err.println(new Date(0xffffffffL * 1000L).toString());
     // System.err.println("-------------------------------8");
-    // uid = new UniqueId(dateToTimestampSeconds(new Date(0xffffffffL * 1000L)), MACHINE_IDENTIFIER, PROCESS_IDENTIFIER,
+    // uid = new UniqueId(dateToTimestampSeconds(new Date(0xffffffffL * 1000L)), MACHINE_IDENTIFIER,
+    // PROCESS_IDENTIFIER,
     // NEXT_COUNTER.getAndIncrement(), false);
     // System.err.println(uid.getDate(0x100000000L * 1000L).toString());
     // System.err.println(uid.getDate(0x100000001L * 1000L).toString());
