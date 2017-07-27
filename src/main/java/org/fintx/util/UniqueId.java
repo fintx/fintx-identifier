@@ -404,8 +404,8 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
         char[] chars = new char[bytes.length * 2];
         int i = 0;
         for (byte b : bytes) {
-            chars[i++] = HEX_CHARS[b >> 4 & 0xF];
-            chars[i++] = HEX_CHARS[b & 0xF];
+            chars[i++] = HEX_CHARS[b >> 4 & 0xf];
+            chars[i++] = HEX_CHARS[b & 0xf];
         }
         return new String(chars);
     }
