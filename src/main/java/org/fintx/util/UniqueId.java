@@ -601,12 +601,12 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
         return num;
     }
 
-    // Test for some extreme condition
     // public static void main(String[] args) {
+    // //Full test!!!!
     // UniqueId uniqueId = null;
-    // for (long lo = new Date().getTime(); lo < Long.MAX_VALUE; lo++) {
-    // uniqueId = new UniqueId(dateToTimestampSeconds(new Date(lo / 1000L * 1000L)), MACHINE_IDENTIFIER,
-    // PROCESS_IDENTIFIER,
+    // for (long lo = new Date().getTime(); lo > 0 && lo < Long.MAX_VALUE; lo += 100) {
+    // uniqueId =
+    // new UniqueId(dateToTimestampSeconds(new Date(lo)), MACHINE_IDENTIFIER, PROCESS_IDENTIFIER,
     // NEXT_COUNTER.getAndIncrement(), false);
     // if (!uniqueId.getDate(lo).toString().equals(new Date(lo / 1000L * 1000L).toString())) {
     // System.err.println("XXXXXXXXXXXXXXXXXXXXXXXXXXLo:" + lo);
@@ -614,11 +614,13 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     // System.err.println(new Date(lo / 1000L * 1000L).toString());
     // throw new RuntimeException();
     // }
-    // if (lo % 100000000 == 0) {
+    // if (lo / 100 % 1000000 == 0) {
     // System.err.println(lo);
     // System.err.println(uniqueId.getDate(lo).toString());
     // }
     // }
+
+    // //Function test!!!!!!
     // System.err.println("-------------------------------1");
     // long l = 12345678901223322L;
     // System.err.println(Long.toBinaryString(l));
@@ -630,7 +632,8 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     // bytes = int2bytes(i);
     // l = bytes2int(bytes);
     // System.err.println(Long.toBinaryString(i));
-    //
+
+    // //Extreme condition test!!!!!!!
     // System.err.println("-------------------------------2");
     // UniqueId uid = new UniqueId(dateToTimestampSeconds(new Date((Integer.MAX_VALUE - 1) * 1000L)),
     // MACHINE_IDENTIFIER, PROCESS_IDENTIFIER,
