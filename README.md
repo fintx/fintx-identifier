@@ -16,17 +16,13 @@ fintx-identifier is for generating unique id in high performance and distributio
 
 ##Example
 1. Get a 20 characters length unique id.    
-<code>
-String id = UniqueId.get().toBase64String();
-</code>    
+    String id = UniqueId.get().toBase64String();
 2. Parse id to get timestamp, machine identifier ( physical MAC address ), process identifier, counter number.    
-<code>
-UniqueId uniqueId = UniqueId.UniqueId.fromBase64String(id);    
-long timestamp = uniqueId.getTimestamp();    
-long machineId = uniqueId.getMachineIdentifier();    
-int processId = uniqueId.getProcessIdentifier();    
-long counter = uniqueId.getCounter();    
-</code>
+    UniqueId uniqueId = UniqueId.UniqueId.fromBase64String(id);    
+    long timestamp = uniqueId.getTimestamp();    
+    long machineId = uniqueId.getMachineIdentifier();    
+    int processId = uniqueId.getProcessIdentifier();    
+    long counter = uniqueId.getCounter();    
 
 [1] FinTx https://www.fintx.org/    
 [2] Maven https://maven.apache.org/    
