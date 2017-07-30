@@ -105,7 +105,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     /**
      * Checks if a string could be an {@code UniqueId}.
      *
-     * @param hexString a potential UniqueId as a String.
+     * @param hexString (base16) or base64String, a potential UniqueId as a String.
      * @return whether the string could be an object id
      * @throws IllegalArgumentException if hexString is null
      */
@@ -181,6 +181,14 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
         return NEXT_COUNTER.get();
     }
 
+    /**
+     * Constructs a new instance from the timestamp,
+     *
+     * @param timestamp in second
+     * @param machineIdentifier the machine identifier
+     * @Param processIdentifier the process identifier
+     * @counter the counter in this jvm
+     */
     private UniqueId(final int timestamp, final long machineIdentifier, final short processIdentifier, final int counter,
             final boolean checkCounter) {
         long current = LAST_TIMESTAMP.get();
@@ -242,7 +250,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     }
 
     /**
-     * Constructs a new instance from a 30-byte hexadecimal string representation.
+     * Constructs a new instance from a 30-byte hexadecimal (base16 encoding) string representation.
      *
      * @param hexString the string to convert
      * @throws IllegalArgumentException if the string is not a valid hex string representation of an UniqueId
@@ -252,9 +260,9 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     }
 
     /**
-     * Constructs a new instance from a 30-byte hexadecimal string representation.
+     * Constructs a new instance from a 20-byte base64 encoding string representation.
      *
-     * @param hexString the string to convert
+     * @param base64String the string to convert
      * @throws IllegalArgumentException if the string is not a valid hex string representation of an UniqueId
      */
     public static UniqueId fromBase64String(final String base64String) {
@@ -265,9 +273,9 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
      * Constructs a new instance from the given byte array
      *
      * @param bytes the byte array
-     * @throws IllegalArgumentException if array is null or not of length 12
+     * @throws IllegalArgumentException if array is null or not of length 15
      */
-    private UniqueId(final byte[] bytes) {
+    public UniqueId(final byte[] bytes) {
         if (bytes == null) {
             throw new IllegalArgumentException();
         }
@@ -281,7 +289,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     }
 
     /**
-     * Convert to a byte array. Note that the numbers are stored in big-endian order.
+     * Convert to a byte array.
      *
      * @return the byte array
      */
@@ -320,7 +328,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     }
 
     /**
-     * Gets the machine identifier.
+     * Gets the machine identifier (physical MAC address).
      *
      * @return the machine identifier
      */
@@ -358,7 +366,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     /**
      * Gets the timestamp as a {@code Date} instance.
      * 
-     * @param timestamp of now
+     * @param timestamp in millisecond of now
      * @return the Date
      */
     private Date getDate(long now) {
@@ -386,19 +394,13 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
      * @return a string representation of the UniqueId in hexadecimal format
      */
     public String toHexString() {
-        char[] chars = new char[30];
-        int i = 0;
-        for (byte b : toByteArray()) {
-            chars[i++] = HEX_CHARS[b >> 4 & 0xF];
-            chars[i++] = HEX_CHARS[b & 0xF];
-        }
-        return new String(chars);
+        return toHexString(toByteArray());
     }
 
     /**
-     * Converts this instance into a 30-byte hexadecimal string representation.
+     * Converts byte array into a hexadecimal string representation.
      *
-     * @return a string representation of the UniqueId in hexadecimal format
+     * @return a string
      */
     private static String toHexString(byte[] bytes) {
         char[] chars = new char[bytes.length * 2];
@@ -411,9 +413,9 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     }
 
     /**
-     * Converts this instance into a 30-byte hexadecimal string representation.
+     * Converts this instance into a 20-byte base64 string representation.
      *
-     * @return a string representation of the UniqueId in hexadecimal format
+     * @return a string representation of the UniqueId in base64 format
      */
     public String toBase64String() {
         return Base64.getUrlEncoder().encodeToString(toByteArray());
@@ -473,7 +475,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
 
     @Override
     public String toString() {
-        return toHexString();
+        return toBase64String();
     }
 
     static {
@@ -485,6 +487,9 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
         }
     }
 
+    /*
+     * Creates the machine identifier from the physical MAC address.
+     */
     private static long createMachineIdentifier() {
         byte[] mac = null;
         try {
@@ -512,8 +517,9 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
 
     }
 
-    // Creates the process identifier. This does not have to be unique per class loader because NEXT_COUNTER will
-    // provide the uniqueness.
+    /*
+     * Creates the process identifier.
+     */
     private static short createProcessIdentifier() {
         short processId;
         try {
@@ -531,6 +537,9 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
         return processId;
     }
 
+    /*
+     * Parse the hexadecimal string (base16 encoding) to bytes array
+     */
     private static byte[] parseHexString(final String s) {
         if (!isValid(s)) {
             throw new IllegalArgumentException("invalid hexadecimal representation of an UniqueId: [" + s + "]");
@@ -543,6 +552,9 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
         return b;
     }
 
+    /*
+     * Parse the base64 String to bytes array
+     */
     private static byte[] parseBase64String(final String s) {
         if (!isValid(s)) {
             throw new IllegalArgumentException("invalid hexadecimal representation of an UniqueId: [" + s + "]");
@@ -551,10 +563,16 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
         return Base64.getUrlDecoder().decode(s);
     }
 
+    /*
+     * Get the timestamp in second from Date instance
+     */
     private static int dateToTimestampSeconds(final Date time) {
         return (int) ((time.getTime() / 1000L) & 0xffffffffL);
     }
 
+    /*
+     * Convert from integer to bytes array
+     */
     private static byte[] int2bytes(int num) {
         byte[] byteNum = new byte[4];
         for (int ix = 0; ix < 4; ++ix) {
@@ -564,6 +582,10 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
         return byteNum;
     }
 
+    
+    /*
+     * Convert from bytes array to integer
+     */
     private static int bytes2int(byte[] byteNum) {
         if (byteNum.length > 4) {
             throw new RuntimeException("byteNum is too long for a int type:" + byteNum.length);
@@ -576,6 +598,9 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
         return num;
     }
 
+    /*
+     * Convert from long to bytes array
+     */
     private static byte[] long2bytes(long num) {
         byte[] byteNum = new byte[8];
         for (int ix = 0; ix < 8; ++ix) {
