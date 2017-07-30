@@ -184,7 +184,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     /**
      * Constructs a new instance from the timestamp,
      *
-     * @param timestamp in second
+     * @param timestamp of second
      * @param machineIdentifier the machine identifier
      * @Param processIdentifier the process identifier
      * @counter the counter in this jvm
@@ -320,7 +320,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     /**
      * Gets the timestamp (number of seconds since the Unix epoch).
      *
-     * @return the timestamp
+     * @return the timestamp of second
      */
     public long getTimestamp() {
         // To unsigned int
@@ -538,7 +538,8 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     }
 
     /*
-     * Parse the hexadecimal string (base16 encoding) to bytes array
+     * Parse the hexadecimal string (base16 encoding) to byte array
+     * 
      * @param s the hexadecimal string
      * 
      */
@@ -555,7 +556,8 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     }
 
     /*
-     * Parse the base64 String to bytes array
+     * Parse the base64 String to byte array
+     * @param s the base64 string
      */
     private static byte[] parseBase64String(final String s) {
         if (!isValid(s)) {
@@ -566,35 +568,35 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     }
 
     /*
-     * Get the timestamp in second from Date instance
+     * Get the timestamp of second from Date instance
      */
     private static int dateToTimestampSeconds(final Date time) {
         return (int) ((time.getTime() / 1000L) & 0xffffffffL);
     }
 
     /*
-     * Convert from integer to bytes array
+     * Convert from integer to byte array
      */
     private static byte[] int2bytes(int num) {
-        byte[] byteNum = new byte[4];
+        byte[] bytes = new byte[4];
         for (int ix = 0; ix < 4; ++ix) {
             int offset = 32 - (ix + 1) * 8;
-            byteNum[ix] = (byte) ((num >> offset) & 0xff);
+            bytes[ix] = (byte) ((num >> offset) & 0xff);
         }
-        return byteNum;
+        return bytes;
     }
 
     /*
-     * Convert from bytes array to integer
+     * Convert from byte array to integer
      */
-    private static int bytes2int(byte[] byteNum) {
-        if (byteNum.length > 4) {
-            throw new RuntimeException("byteNum is too long for a int type:" + byteNum.length);
+    private static int bytes2int(byte[] bytes) {
+        if (bytes.length > 4) {
+            throw new RuntimeException("byteNum is too long for a int type:" + bytes.length);
         }
         int num = 0;
-        for (int ix = 0; ix < byteNum.length; ++ix) {
+        for (int ix = 0; ix < bytes.length; ++ix) {
             num <<= 8;
-            num |= (byteNum[ix] & 0xff);
+            num |= (bytes[ix] & 0xff);
         }
         return num;
     }
@@ -603,25 +605,25 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
      * Convert from long to bytes array
      */
     private static byte[] long2bytes(long num) {
-        byte[] byteNum = new byte[8];
+        byte[] bytes = new byte[8];
         for (int ix = 0; ix < 8; ++ix) {
             int offset = 64 - (ix + 1) * 8;
-            byteNum[ix] = (byte) ((num >> offset) & 0xff);
+            bytes[ix] = (byte) ((num >> offset) & 0xff);
         }
-        return byteNum;
+        return bytes;
     }
 
-    private static long bytes2long(byte[] byteNum) {
-        for (long lo = 0; lo < Long.MIN_VALUE; lo++) {
-
-        }
-        if (byteNum.length > 8) {
-            throw new RuntimeException("byteNum is too long for a long type:" + byteNum.length);
+    /*
+     * Convert from bytes array to  long type
+     */
+    private static long bytes2long(byte[] bytes) {
+        if (bytes.length > 8) {
+            throw new RuntimeException("byteNum is too long for a long type:" + bytes.length);
         }
         long num = 0;
-        for (int ix = 0; ix < byteNum.length; ++ix) {
+        for (int ix = 0; ix < bytes.length; ++ix) {
             num <<= 8;
-            num |= (byteNum[ix] & 0xff);// byte become 64bit since the index 1 with higher bit 1? & 0xff make higher bit
+            num |= (bytes[ix] & 0xff);// byte become 64bit since the index 1 with higher bit 1? & 0xff make higher bit
                                         // 0
         }
         return num;
