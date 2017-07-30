@@ -366,7 +366,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     /**
      * Gets the timestamp as a {@code Date} instance.
      * 
-     * @param timestamp in millisecond of now
+     * @param now the timestamp in millisecond
      * @return the Date
      */
     private Date getDate(long now) {
@@ -539,6 +539,8 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
 
     /*
      * Parse the hexadecimal string (base16 encoding) to bytes array
+     * @param s the hexadecimal string
+     * 
      */
     private static byte[] parseHexString(final String s) {
         if (!isValid(s)) {
@@ -582,7 +584,6 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
         return byteNum;
     }
 
-    
     /*
      * Convert from bytes array to integer
      */
