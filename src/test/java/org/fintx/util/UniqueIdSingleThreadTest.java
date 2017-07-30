@@ -1,8 +1,5 @@
 package org.fintx.util;
 
-import static org.junit.Assert.*;
-
-import java.util.Base64;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -43,16 +40,16 @@ public class UniqueIdSingleThreadTest {
             Assert.assertTrue("Unsafe Base64 encode and decode, original id:" + i + " " + uniqueId30,
                     uniqueId30.equals(UniqueId.fromBase64String(uniqueId20).toHexString()));
             Assert.assertTrue("Unsafe Base64 encode and decode, original id:" + i + " " + uniqueId30,
-                    UniqueId.fromHexString(uniqueId30).getTimestamp()==UniqueId.fromBase64String(uniqueId20).getTimestamp());
+                    UniqueId.fromHexString(uniqueId30).getTimestamp() == UniqueId.fromBase64String(uniqueId20).getTimestamp());
             Assert.assertTrue("Unsafe Base64 encode and decode, original id:" + i + " " + uniqueId30,
-                    UniqueId.fromHexString(uniqueId30).getMachineIdentifier()==UniqueId.fromBase64String(uniqueId20).getMachineIdentifier());
+                    UniqueId.fromHexString(uniqueId30).getMachineIdentifier() == UniqueId.fromBase64String(uniqueId20).getMachineIdentifier());
             Assert.assertTrue("Unsafe Base64 encode and decode, original id:" + i + " " + uniqueId30,
-                    UniqueId.fromHexString(uniqueId30).getProcessIdentifier()==UniqueId.fromBase64String(uniqueId20).getProcessIdentifier());
+                    UniqueId.fromHexString(uniqueId30).getProcessIdentifier() == UniqueId.fromBase64String(uniqueId20).getProcessIdentifier());
             Assert.assertTrue("Unsafe Base64 encode and decode, original id:" + i + " " + uniqueId30,
-                    UniqueId.fromHexString(uniqueId30).getCounter()==UniqueId.fromBase64String(uniqueId20).getCounter());
+                    UniqueId.fromHexString(uniqueId30).getCounter() == UniqueId.fromBase64String(uniqueId20).getCounter());
         }
 
-        Set set = new HashSet(count + 2);
+        Set<String> set = new HashSet<String>(count + 2);
         for (int i = 0; i < count; i++) {
 
             uniqueId20 = UniqueId.get().toBase64String();

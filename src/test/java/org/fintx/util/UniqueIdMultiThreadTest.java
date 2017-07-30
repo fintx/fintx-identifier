@@ -39,7 +39,7 @@ public class UniqueIdMultiThreadTest {
 
     @Test
     public void test() {
-        Set set = new HashSet(threads * count);
+        Set<String> set = new HashSet<String>(threads * count);
         for (int i = 0; i < threads; i++) {
             Thread t1 = new Thread(new Runnable() {
 
