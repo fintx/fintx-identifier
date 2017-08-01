@@ -13,7 +13,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class UniqueIdMultiThreadTest {
-    public int count = 2000000;
+    public int count = 1000000;
     public int threads = 8;
     public boolean error = false;
 
