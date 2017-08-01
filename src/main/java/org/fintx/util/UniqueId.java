@@ -96,7 +96,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     /**
      * Gets a new object id.
      *
-     * @return the new id
+     * @return the new https://oss.sonatype.org/content/repositories/snapshots
      */
     public static UniqueId get() {
         return new UniqueId(dateToTimestampSeconds(new Date()), MACHINE_IDENTIFIER, PROCESS_IDENTIFIER, NEXT_COUNTER.getAndIncrement(), false);
@@ -105,7 +105,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     /**
      * Checks if a string could be an {@code UniqueId}.
      *
-     * @param hexString (base16) or base64String, a potential UniqueId as a String.
+     * @param idString  hexString (base16) or base64String, a potential UniqueId as a String.
      * @return whether the string could be an object id
      * @throws IllegalArgumentException if hexString is null
      */
@@ -253,6 +253,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
      * Constructs a new instance from a 30-byte hexadecimal (base16 encoding) string representation.
      *
      * @param hexString the string to convert
+     * @return new UniqueId instance
      * @throws IllegalArgumentException if the string is not a valid hex string representation of an UniqueId
      */
     public static UniqueId fromHexString(final String hexString) {
@@ -263,6 +264,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
      * Constructs a new instance from a 20-byte base64 encoding string representation.
      *
      * @param base64String the string to convert
+     * @return new UniqueId instance
      * @throws IllegalArgumentException if the string is not a valid hex string representation of an UniqueId
      */
     public static UniqueId fromBase64String(final String base64String) {
