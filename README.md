@@ -25,8 +25,8 @@ This is something that you get for free just by adding the following dependency 
 
 ```xml
 <dependency>
-    <groupId>org.springframework.cloud</groupId>
-    <artifactId>spring-cloud-starter-kubernetes</artifactId>
+    <groupId>org.fintx</groupId>
+    <artifactId>fintx-identifer</artifactId>
     <version>${latest.version></version>
 </dependency>
 ```
