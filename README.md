@@ -1,6 +1,8 @@
 ## FinTx Identifier Generator
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.fintx/fintx-identifier/badge.svg?style=flat-square)](https://maven-badges.herokuapp.com/maven-central/org.fintx/fintx-identifier/) ![Apache 2](http://img.shields.io/badge/license-Apache%202-red.svg)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.fintx/fintx-identifier/badge.svg?style=flat-square)](https://maven-badges.herokuapp.com/maven-central/org.fintx/fintx-identifier/)
+[![GitHub release](https://img.shields.io/github/release/fintx/fintx-identifier.svg)](https://github.com/fintx/fintx-identifier/releases)
+![Apache 2](http://img.shields.io/badge/license-Apache%202-red.svg)
 
 # FinTx[1]
 
