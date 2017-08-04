@@ -3,9 +3,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.fintx</groupId>
 	<artifactId>fintx-identifier</artifactId>
-	<version>0.1.0.0-SNAPSHOT</version>
+	<version>0.2.0.0-SNAPSHOT</version>
 	<name>fintx-identifier</name>
-	<description>Distribute unique id generator base on ObjectId that understandable </description>
+	<description>Distributed unique id generator base on ObjectId that understandable.</description>
 	<url>www.fintx.org</url>
 	<organization>
 		<name>FinTx</name>
