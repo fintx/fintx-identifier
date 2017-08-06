@@ -68,8 +68,8 @@ import java.util.concurrent.atomic.AtomicLong;
  * Limitations:
  * </p>
  * <p>
- * ProcessId on os could not bigger then 65535. Only in one bundle of same JVM when using OSGI. Generated id number
- * could not more then about 16777215 per second per JVM. Id maybe (hardly) generate the same one every 69 years.
+ * ProcessId on os could not bigger then 65535. Only in one bundle of same JVM when using OSGI. Generated id number could not more then about 16777215 per
+ * second per JVM. Id maybe (hardly) generate the same one every 69 years.
  * </p>
  *
  */
@@ -105,7 +105,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     /**
      * Checks if a string could be an {@code UniqueId}.
      *
-     * @param idString  hexString (base16) or base64String, a potential UniqueId as a String.
+     * @param idString hexString (base16) or base64String, a potential UniqueId as a String.
      * @return whether the string could be an object id
      * @throws IllegalArgumentException if hexString is null
      */
@@ -189,8 +189,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
      * @Param processIdentifier the process identifier
      * @counter the counter in this jvm
      */
-    private UniqueId(final int timestamp, final long machineIdentifier, final short processIdentifier, final int counter,
-            final boolean checkCounter) {
+    private UniqueId(final int timestamp, final long machineIdentifier, final short processIdentifier, final int counter, final boolean checkCounter) {
         long current = LAST_TIMESTAMP.get();
 
         if (((timestamp & 0xffffffffL) == (current & 0xffffffffL))) {
@@ -384,8 +383,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
         // Timestamp is in this round of zero to 0xffffffffL scope but bigger then now
         // @formatter:on
         } else {
-            throw new IllegalArgumentException(
-                    "The timestamp must not be less then the timestamp now. (Maybe the machine correct time using time server).");
+            throw new IllegalArgumentException("The timestamp must not be less then the timestamp now. (Maybe the machine correct time using time server).");
         }
 
     }
@@ -559,6 +557,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
 
     /*
      * Parse the base64 String to byte array
+     * 
      * @param s the base64 string
      */
     private static byte[] parseBase64String(final String s) {
@@ -616,7 +615,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     }
 
     /*
-     * Convert from bytes array to  long type
+     * Convert from bytes array to long type
      */
     private static long bytes2long(byte[] bytes) {
         if (bytes.length > 8) {
@@ -626,7 +625,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
         for (int ix = 0; ix < bytes.length; ++ix) {
             num <<= 8;
             num |= (bytes[ix] & 0xff);// byte become 64bit since the index 1 with higher bit 1? & 0xff make higher bit
-                                        // 0
+                                      // 0
         }
         return num;
     }

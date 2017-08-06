@@ -47,17 +47,17 @@ public class UniqueIdMultiThreadTest {
                 public void run() {
                     try {
                         runtest();
-                    }catch (Throwable t) {
+                    } catch (Throwable t) {
                         t.printStackTrace();
-                        error=true;
+                        error = true;
                     }
-                    
+
                 }
 
             });
             t1.start();
         }
-        while ((list.size() != threads)&&!error) {
+        while ((list.size() != threads) && !error) {
             System.err.print(list.size());
             try {
                 Thread.sleep(1000);
@@ -65,14 +65,14 @@ public class UniqueIdMultiThreadTest {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            
+
         }
         System.err.println("");
-        for (int i=0;i<threads ;i++) {
+        for (int i = 0; i < threads; i++) {
             set.addAll(list.get(0));
             list.remove(0);
         }
-        System.err.println("The id number sum compare result:"+(set.size() == threads * count));
+        System.err.println("The id number sum compare result:" + (set.size() == threads * count));
     }
 
     public Set<String> runtest() {
