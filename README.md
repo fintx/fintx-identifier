@@ -39,7 +39,7 @@ String id = UniqueId.get().toBase64String();
 2. Parse id to get timestamp, machine identifier (physical MAC address), process identifier, counter number.
 
 ```java
-UniqueId uniqueId = UniqueId.UniqueId.fromBase64String(id);    
+UniqueId uniqueId = UniqueId.fromBase64String(id);    
 long timestamp = uniqueId.getTimestamp();    
 long machineId = uniqueId.getMachineIdentifier();    
 int processId = uniqueId.getProcessIdentifier();    
