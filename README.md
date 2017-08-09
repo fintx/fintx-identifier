@@ -1,5 +1,7 @@
 ## FinTx Identifier Generator
 
+[![Join the chat at https://gitter.im/fintx/fintx-identifier](https://badges.gitter.im/fintx/fintx-identifier.svg)](https://gitter.im/fintx/fintx-identifier?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.fintx/fintx-identifier/badge.svg?style=flat-square)](https://maven-badges.herokuapp.com/maven-central/org.fintx/fintx-identifier/)
 [![GitHub release](https://img.shields.io/github/release/fintx/fintx-identifier.svg)](https://github.com/fintx/fintx-identifier/releases)
 ![Apache 2](http://img.shields.io/badge/license-Apache%202-red.svg)
