@@ -77,6 +77,18 @@
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<version>2.7</version>
+				<configuration>
+					<formats>
+						<format>html</format>
+						<format>xml</format>
+					</formats>
+					<check />
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 	<profiles>
@@ -89,7 +101,7 @@
 				</repository>
 			</distributionManagement>
 			<build>
-				<!-- finalName>${project.artifactId}</finalName-->
+				<!-- finalName>${project.artifactId}</finalName -->
 				<plugins>
 					<plugin>
 						<groupId>org.sonatype.plugins</groupId>
@@ -154,7 +166,7 @@
 				</snapshotRepository>
 			</distributionManagement>
 			<build>
-			<!-- finalName>${project.artifactId}-SNAPSHOT</finalName-->
+				<!-- finalName>${project.artifactId}-SNAPSHOT</finalName -->
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
