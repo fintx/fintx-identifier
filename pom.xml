@@ -34,6 +34,10 @@
 		<connection>https://github.com/fintx/fintx-identifier.git</connection>
 		<tag>fintx-identifier</tag>
 	</scm>
+	<properties>
+		<github.global.server>github</github.global.server>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -178,6 +182,25 @@
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
+		</profile>
+		<!-- Profile for TravisCI to handle coverage metrics, etc. -->
+		<profile>
+			<id>travis</id>
+			<activation>
+				<property>
+					<name>env.TRAVIS</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.eluder.coveralls</groupId>
+						<artifactId>coveralls-maven-plugin</artifactId>
+						<version>4.3.0</version>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 	</profiles>
 
