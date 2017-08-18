@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * </p>
  *
  * <p>
- * Consists of 12 bytes, divided as follows:
+ * Consists of 15 bytes, divided as follows:
  * </p>
  * <table border="1">
  * <caption>ObjectID layout</caption>
@@ -111,7 +111,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
      */
     public static boolean isValid(final String idString) {
         if (idString == null) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Argument should not be null!");
         }
 
         int len = idString.length();
@@ -182,6 +182,15 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     }
 
     /**
+     * Gets the current value of the auto-incrementing counter.
+     *
+     * @return the current counter value.
+     */
+    public static long getCurrentTimeStamp() {
+        return LAST_TIMESTAMP.get() & 0x0ffffffffL;
+    }
+
+    /**
      * Constructs a new instance from the timestamp,
      *
      * @param timestamp of second
@@ -249,7 +258,18 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     }
 
     /**
-     * Constructs a new instance from a 30-byte hexadecimal (base16 encoding) string representation.
+     * Constructs a new instance from a 15 byte array.
+     *
+     * @param bytes the byte array
+     * @return new UniqueId instance
+     * @throws IllegalArgumentException if the byte array is not a valid for an UniqueId
+     */
+    public static UniqueId fromByteArray(final byte[] bytes) {
+        return new UniqueId(bytes);
+    }
+
+    /**
+     * Constructs a new instance from a 60-byte hexadecimal (base16 encoding) string representation.
      *
      * @param hexString the string to convert
      * @return new UniqueId instance
@@ -260,7 +280,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     }
 
     /**
-     * Constructs a new instance from a 20-byte base64 encoding string representation.
+     * Constructs a new instance from a 40-byte base64 encoding string representation.
      *
      * @param base64String the string to convert
      * @return new UniqueId instance
@@ -276,12 +296,12 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
      * @param bytes the byte array
      * @throws IllegalArgumentException if array is null or not of length 15
      */
-    public UniqueId(final byte[] bytes) {
+    private UniqueId(final byte[] bytes) {
         if (bytes == null) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Argument should not be null!");
         }
         if (bytes.length != 15) {
-            throw new IllegalArgumentException("need 15 bytes");
+            throw new IllegalArgumentException("Argument need 15 bytes");
         }
         timestamp = bytes2int(Arrays.copyOfRange(bytes, 0, 4));
         machineIdentifier = bytes2long(Arrays.copyOfRange(bytes, 4, 10));
@@ -389,7 +409,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     }
 
     /**
-     * Converts this instance into a 30-byte hexadecimal string representation.
+     * Converts this instance into a 60-byte hexadecimal string representation.
      *
      * @return a string representation of the UniqueId in hexadecimal format
      */
@@ -413,7 +433,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     }
 
     /**
-     * Converts this instance into a 20-byte base64 string representation.
+     * Converts this instance into a 40-byte base64 string representation.
      *
      * @return a string representation of the UniqueId in base64 format
      */
