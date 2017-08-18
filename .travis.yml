@@ -1,7 +1,14 @@
 language: java
-sudo: false # faster builds
 
-script: "mvn cobertura:cobertura"
+sudo: false
+
+dist: precise
+
+jdk:
+  - oraclejdk8
+
+script:
+  - mvn
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+  - mvn clean cobertura:cobertura coveralls:report

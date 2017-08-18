@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.fintx</groupId>
 	<artifactId>fintx-identifier</artifactId>
-	<version>0.3.0.0-SNAPSHOT</version>
+	<version>0.3.0.0</version>
 	<name>fintx-identifier</name>
 	<description>Distributed unique id generator base on ObjectId that understandable.</description>
 	<url>www.fintx.org</url>
@@ -90,7 +90,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
+				<version>3.6.2</version>
 				<configuration>
 					<skip>true</skip>
 					<source>1.8</source>
@@ -100,7 +100,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
-				<version>3.0.1</version>
+				<version>3.0.2</version>
 				<configuration>
 					<encoding>UTF-8</encoding>
 				</configuration>
@@ -116,6 +116,11 @@
 					</formats>
 					<check />
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.eluder.coveralls</groupId>
+				<artifactId>coveralls-maven-plugin</artifactId>
+				<version>4.3.0</version>
 			</plugin>
 		</plugins>
 	</build>
