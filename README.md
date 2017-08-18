@@ -7,6 +7,7 @@
 [![Build Status](https://travis-ci.org/fintx/fintx-identifier.svg?branch=master)](https://travis-ci.org/fintx/fintx-identifier)
 [![codecov.io](https://codecov.io/github/fintx/fintx-identifier/coverage.svg?branch=master)](https://codecov.io/github/fintx/fintx-identifier?branch=master)
 [![Dependency Status](https://www.versioneye.com/user/projects/598c0fa3368b0838815ce60c/badge.svg?style=flat)](https://www.versioneye.com/user/projects/598c0fa3368b0838815ce60c)
+[![Coverage Status](https://coveralls.io/repos/github/fintx/fintx-identifier/badge.svg)](https://coveralls.io/github/fintx/fintx-identifier)
 
 
 # FinTx[1]

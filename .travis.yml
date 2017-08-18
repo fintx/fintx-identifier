@@ -7,8 +7,5 @@ dist: precise
 jdk:
   - oraclejdk8
 
-script:
-  - mvn
-
 after_success:
   - mvn clean cobertura:cobertura coveralls:report
