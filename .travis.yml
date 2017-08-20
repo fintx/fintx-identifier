@@ -8,5 +8,5 @@ jdk:
   - oraclejdk8
 
 after_success:
-  - mvn cobertura:cobertura coveralls:cobertura
   - bash <(curl -s https://codecov.io/bash)
+  - mvn coveralls:report -Ptravis

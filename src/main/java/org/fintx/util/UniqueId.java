@@ -236,10 +236,10 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
                     LAST_TIMESTAMP.set(timestamp & 0xffffffffL);
                     current = (timestamp & 0xffffffffL);
                 } else {
-                    System.err.println(((LAST_TIMESTAMP.get() & 0xffffffffL) - (timestamp & 0xffffffffL)));
-                    System.err.println(timestamp);
-                    System.err.println(current);
-                    System.err.println(LAST_TIMESTAMP.get());
+//                    System.err.println(((LAST_TIMESTAMP.get() & 0xffffffffL) - (timestamp & 0xffffffffL)));
+//                    System.err.println(timestamp);
+//                    System.err.println(current);
+//                    System.err.println(LAST_TIMESTAMP.get());
                     throw new IllegalArgumentException(
                             "The timestamp must not be less then the timestamp last time. (Maybe the machine correct time using time server).");
                 }
