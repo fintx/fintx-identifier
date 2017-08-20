@@ -7,6 +7,7 @@ branches:
 jdk:
   - oraclejdk8
 
+script: mvn test coveralls:report -Ptravis
+
 after_success:
   - bash <(curl -s https://codecov.io/bash)
-  - mvn coveralls:report -Ptravis
