@@ -7,5 +7,14 @@ branches:
 jdk:
   - oraclejdk8
 
+env:
+  global:
+    - JAVA_OPTS="-Xmx2G"
+    - MAVEN_OPTS="-Xmx2G"
+
+before_script:
+  - echo $JAVA_OPTS
+  - echo $MAVEN_OPTS
+
 after_success:
   - mvn coveralls:report -Ptravis
