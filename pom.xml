@@ -6,7 +6,6 @@
 	<version>0.3.0.0-SNAPSHOT</version>
 	<name>fintx-identifier</name>
 	<description>Distributed unique id generator base on ObjectId that understandable.</description>
-	<packaging>jar</packaging>
 	<url>www.fintx.org</url>
 	<organization>
 		<name>FinTx</name>
@@ -36,6 +35,7 @@
 		<tag>fintx-identifier</tag>
 	</scm>
 	<properties>
+		<java.version>1.8</java.version>
 		<github.global.server>github</github.global.server>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -99,7 +99,7 @@
 				<version>2.20</version>
 				<configuration>
 					<!-- skip>false</skip> <skipTests>false</skipTests> -->
-					<argLine>-Xmx4096M ${argLine}</argLine> 
+					<argLine>-Xmx4096M ${argLine}</argLine>
 					<includes>
 						<include>**/*Test.java</include>
 					</includes>
@@ -128,27 +128,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-pmd-plugin</artifactId>
-				<version>3.8</version>
-				<configuration>
-					<sourceEncoding>utf-8</sourceEncoding>
-					<language>java</language>
-					<verbose>true</verbose>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>findbugs-maven-plugin</artifactId>
-				<version>3.0.5</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>2.5</version>
-			</plugin>
 		</plugins>
 	</build>
 	<reporting>
@@ -171,19 +150,23 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>2.17</version>
 				<configuration>
 					<configLocation>checkstyle.xml</configLocation>
 				</configuration>
-				<version>2.5</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-pmd-plugin</artifactId>
 				<version>3.8</version>
 				<configuration>
-					<sourceEncoding>utf-8</sourceEncoding>
+					<sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
 					<language>java</language>
 					<verbose>true</verbose>
+					<rulesets>
+						<ruleset>pmd.xml</ruleset>
+					</rulesets>
+					<targetJdk>${java.version}</targetJdk>
 				</configuration>
 			</plugin>
 			<plugin>

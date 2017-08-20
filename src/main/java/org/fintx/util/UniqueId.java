@@ -80,6 +80,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     private static final int LOW_ORDER_THREE_BYTES = 0x00ffffff;
 
     private static final long MACHINE_IDENTIFIER;
+
     private static final short PROCESS_IDENTIFIER;
 
     private static final AtomicInteger NEXT_COUNTER = new AtomicInteger(new SecureRandom().nextInt());
@@ -89,8 +90,11 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     private static final char[] HEX_CHARS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
     private final int timestamp;
+
     private final long machineIdentifier;
+
     private final short processIdentifier;
+
     private final int counter;
 
     /**
@@ -220,7 +224,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
                 } else if ((timestamp & 0xffffffffL) == (current & 0xffffffffL)) {
                     this.timestamp = timestamp;
                     this.counter = counter & LOW_ORDER_THREE_BYTES;
-                } else if (((current & 0xffffffffL) - (timestamp & 0xffffffffL)) == 1L) {
+                } else if ((current & 0xffffffffL) - (timestamp & 0xffffffffL) == 1L) {
                     this.timestamp = (int) current;
                     this.counter = counter & LOW_ORDER_THREE_BYTES;
                 } else {
@@ -235,11 +239,11 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
         // @formatter:on    
             synchronized (UniqueId.class) {
                 current = LAST_TIMESTAMP.get();
-                if (((current & 0xffffffffL) - (timestamp & 0xffffffffL)) == 1L) {
+                if ((current & 0xffffffffL) - (timestamp & 0xffffffffL) == 1L) {
                 // @formatter:off
                 // LAST_TIMESTAMP increased after timestamp generated
                 // @formatter:on  
-                    
+
                 } else if (((LAST_TIMESTAMP.get() & 0xffffffffL) - (timestamp & 0xffffffffL)) >= 0x7fffffffL) {
                     // timestamp is in the new round of zero to 0xffffffffL. 0x7fffffffL is half of 0xffffffffL.
                     // A round is about 69 years, so the gap between last timestamp in the last round and new timestamp in this round will not less then 34
@@ -512,12 +516,8 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     }
 
     static {
-        try {
-            MACHINE_IDENTIFIER = createMachineIdentifier();
-            PROCESS_IDENTIFIER = createProcessIdentifier();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        MACHINE_IDENTIFIER = createMachineIdentifier();
+        PROCESS_IDENTIFIER = createProcessIdentifier();
     }
 
     /**
@@ -579,7 +579,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     }
 
     /**
-     * Parse the hexadecimal string (base16 encoding) to byte array
+     * Parse the hexadecimal string (base16 encoding) to byte array.
      * 
      * @param s the hexadecimal string
      * @return
@@ -597,7 +597,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     }
 
     /**
-     * Parse the base64 String to byte array
+     * Parse the base64 String to byte array.
      * 
      * @param s the base64 string
      */
@@ -650,8 +650,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
         long num = 0;
         for (int ix = 0; ix < bytes.length; ++ix) {
             num <<= 8;
-            num |= (bytes[ix] & 0xff);// byte become 64bit since the index 1 with higher bit 1? & 0xff make higher bit
-                                      // 0
+            num |= (bytes[ix] & 0xff); // byte become 64bit since the index 1 with higher bit 1? & 0xff make higher bit 0
         }
         return num;
     }
