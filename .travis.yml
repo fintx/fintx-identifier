@@ -1,11 +1,14 @@
 language: java
 
-sudo: false
-
-dist: precise
-
 jdk:
   - oraclejdk8
 
+before_script:
+    - echo "MAVEN_OPTS='-Xmx1024m'" > ~/.mavenrc
+    
+script:
+  - mvn cobertura:cobertura
+
 after_success:
-  - mvn clean cobertura:cobertura coveralls:report
+  - mvn coveralls:report -Ptravis
+  - bash <(curl -s https://codecov.io/bash)

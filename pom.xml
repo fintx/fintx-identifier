@@ -3,9 +3,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.fintx</groupId>
 	<artifactId>fintx-identifier</artifactId>
-	<version>0.3.0.0</version>
+	<version>0.3.0.0-SNAPSHOT</version>
 	<name>fintx-identifier</name>
 	<description>Distributed unique id generator base on ObjectId that understandable.</description>
+	<packaging>jar</packaging>
 	<url>www.fintx.org</url>
 	<organization>
 		<name>FinTx</name>
@@ -35,7 +36,6 @@
 		<tag>fintx-identifier</tag>
 	</scm>
 	<properties>
-		<github.global.server>github</github.global.server>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<dependencies>
@@ -47,23 +47,6 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<finalName>${project.artifactId}</finalName>
-		<resources>
-			<resource>
-				<directory>src/main/java</directory>
-				<includes>
-					<include>**</include>
-				</includes>
-				<filtering>false</filtering>
-			</resource>
-			<resource>
-				<directory>src/main/resources/</directory>
-				<includes>
-					<include>**</include>
-				</includes>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -118,8 +101,7 @@
 						<format>html</format>
 						<format>xml</format>
 					</formats>
-					<maxmem>256m</maxmem>
-					<check />
+					<check>true</check>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -179,7 +161,6 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 		</profile>
-		<!-- Profile for TravisCI to handle coverage metrics, etc. -->
 		<profile>
 			<id>travis</id>
 			<activation>
@@ -199,5 +180,6 @@
 			</build>
 		</profile>
 	</profiles>
+
 
 </project>
