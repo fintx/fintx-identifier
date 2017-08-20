@@ -9,15 +9,15 @@ jdk:
 
 env:
   global:
-    - JAVA_OPTS="-Xmx4G"
-    - MAVEN_OPTS="-Xmx4G"
+    - JAVA_OPTS="-Xmx2G"
+    - MAVEN_OPTS="-Xmx2G"
 
 before_script:
   - echo $JAVA_OPTS
   - echo $MAVEN_OPTS
   
 script:
-  - mvn -e -X test
+  - mvn test
 
 after_success:
   - mvn coveralls:report -Ptravis
