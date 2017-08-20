@@ -98,8 +98,8 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.20</version>
 				<configuration>
-					<!-- skip>false</skip>
-					<skipTests>false</skipTests> -->
+					<!-- skip>false</skip> <skipTests>false</skipTests> -->
+					<argLine>-Xmx4096M ${argLine}</argLine> 
 					<includes>
 						<include>**/*Test.java</include>
 					</includes>
@@ -171,6 +171,9 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
+				<configuration>
+					<configLocation>checkstyle.xml</configLocation>
+				</configuration>
 				<version>2.5</version>
 			</plugin>
 			<plugin>

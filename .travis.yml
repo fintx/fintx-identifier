@@ -17,7 +17,7 @@ before_script:
   - echo $MAVEN_OPTS
   
 script:
-  - mvn -e test
+  - mvn -e -X test
 
 after_success:
   - mvn coveralls:report -Ptravis
