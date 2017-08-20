@@ -86,14 +86,26 @@ public class UniqueIdTest {
         thrown.expectMessage("Argument should not be null!");
         UniqueId.fromByteArray(null);
         thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("invalid hexadecimal representation of an UniqueId");
+        UniqueId.fromBase64String(UUID.randomUUID().toString());
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("invalid hexadecimal representation of an UniqueId");
+        UniqueId.fromHexString(UUID.randomUUID().toString());
+        thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Argument need 15 bytes");
         UniqueId.fromByteArray(UUID.randomUUID().toString().getBytes());
         thrown.expect(NullPointerException.class);
-        UniqueId.get().compareTo(null);
-        UniqueId.getCurrentCounter();
-        UniqueId.getCurrentTimeStamp();
-        UniqueId.getGeneratedMachineIdentifier();
-        UniqueId.getGeneratedProcessIdentifier();
+        UniqueId uniqueId=UniqueId.get();
+        uniqueId.compareTo(UniqueId.get());
+        uniqueId.compareTo(null);
+        uniqueId.equals(null);
+       try {
+        Thread.sleep(1001);
+    } catch (InterruptedException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+    }
+       uniqueId.compareTo(UniqueId.get());
         runtest();
     }
 
@@ -163,7 +175,6 @@ public class UniqueIdTest {
             uniqueId20 = uniqueId.toBase64String();
             Assert.assertFalse("Unsafe Base64 encode and decode, original id:" + i + " " + uniqueId30,
                     UniqueId.isValid(UUID.randomUUID().toString().substring(0, 30)));
-            Assert.assertFalse("Unsafe Base64 encode and decode, original id:" + i + " " + uniqueId30, uniqueId.equals(null));
             Assert.assertFalse("Unsafe Base64 encode and decode, original id:" + i + " " + uniqueId30, UniqueId.isValid(UUID.randomUUID().toString()));
             Assert.assertTrue("Unsafe Base64 encode and decode, original id:" + i + " " + uniqueId30, UniqueId.isValid(uniqueId30));
             Assert.assertTrue("Unsafe Base64 encode and decode, original id:" + i + " " + uniqueId30, UniqueId.isValid(uniqueId20));
@@ -200,7 +211,16 @@ public class UniqueIdTest {
             Assert.assertTrue("Unsafe Base64 encode and decode, original id:" + i + " " + uniqueId30,
                     UniqueId.fromHexString(uniqueId30).hashCode() == UniqueId.fromBase64String(uniqueId20).hashCode());
             Assert.assertFalse(UniqueId.fromHexString(uniqueId30).equals(UniqueId.get()));
-
+            
+            UniqueId.getCurrentCounter();
+            UniqueId.getCurrentTimeStamp();
+            UniqueId.getGeneratedMachineIdentifier();
+            UniqueId.getGeneratedProcessIdentifier();
+            
+            uniqueId.getCurrentCounter();
+            uniqueId.getCurrentTimeStamp();
+            uniqueId.getGeneratedMachineIdentifier();
+            uniqueId.getGeneratedProcessIdentifier();
         }
         Set<String> set = new HashSet<String>(count);
         for (int i = 0; i < count; i++) {
