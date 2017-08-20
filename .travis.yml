@@ -4,11 +4,7 @@ jdk:
   - oraclejdk8
 
 before_script:
-    - echo "MAVEN_OPTS='-Xmx1024m'" > ~/.mavenrc
-    
-script:
+  - echo "MAVEN_OPTS='-Xmx1024m'" > ~/.mavenrc
   - mvn cobertura:cobertura
-
-after_success:
   - mvn coveralls:report -Ptravis
   - bash <(curl -s https://codecov.io/bash)
