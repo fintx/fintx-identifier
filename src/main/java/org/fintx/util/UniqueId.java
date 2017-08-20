@@ -84,9 +84,9 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
 
     private static final AtomicInteger NEXT_COUNTER = new AtomicInteger(new SecureRandom().nextInt());
     // to prevent time change back maybe when use time server to correct the machine time.
-    private static volatile AtomicLong LAST_TIMESTAMP = new AtomicLong(0);
+    private static final AtomicLong LAST_TIMESTAMP = new AtomicLong(0);
 
-    private static final char[] HEX_CHARS = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+    private static final char[] HEX_CHARS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
     private final int timestamp;
     private final long machineIdentifier;
@@ -120,14 +120,13 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
                 char c = idString.charAt(i);
                 if (c >= '0' && c <= '9') {
                     continue;
-                }
-                if (c >= 'a' && c <= 'f') {
+                } else if (c >= 'a' && c <= 'f') {
                     continue;
-                }
-                if (c >= 'A' && c <= 'F') {
+                } else if (c >= 'A' && c <= 'F') {
                     continue;
+                } else {
+                    return false;
                 }
-                return false;
             }
             return true;
         } else if (len == 20) {
@@ -135,17 +134,15 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
                 char c = idString.charAt(i);
                 if (c >= '0' && c <= '9') {
                     continue;
-                }
-                if (c >= 'a' && c <= 'z') {
+                } else if (c >= 'a' && c <= 'z') {
                     continue;
-                }
-                if (c >= 'A' && c <= 'Z') {
+                } else if (c >= 'A' && c <= 'Z') {
                     continue;
-                }
-                if (c == '_' || c == '-') {
+                } else if (c == '_' || c == '-') {
                     continue;
+                } else {
+                    return false;
                 }
-                return false;
             }
             return true;
         } else {
@@ -187,63 +184,78 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
      * @return the current counter value.
      */
     public static long getCurrentTimeStamp() {
-        return LAST_TIMESTAMP.get() & 0x0ffffffffL;
+        return LAST_TIMESTAMP.get() & 0xffffffffL;
     }
 
     /**
-     * Constructs a new instance from the timestamp,
+     * Constructs a new instance from the timestamp
      *
      * @param timestamp of second
      * @param machineIdentifier the machine identifier
-     * @Param processIdentifier the process identifier
-     * @counter the counter in this jvm
+     * @param processIdentifier the process identifier
+     * @param counter the counter in this jvm
+     * @param checkCounter whether or not need check counter
      */
     private UniqueId(final int timestamp, final long machineIdentifier, final short processIdentifier, final int counter, final boolean checkCounter) {
         long current = LAST_TIMESTAMP.get();
 
-        if (((timestamp & 0xffffffffL) == (current & 0xffffffffL))) {
+        if ((timestamp & 0xffffffffL) == (current & 0xffffffffL)) {
         // @formatter:off
         // mostly   
         // @formatter:on
 
-            // Do nothing
+            this.timestamp = timestamp;
+            this.counter = counter & LOW_ORDER_THREE_BYTES;
 
-        } else if (((timestamp & 0xffffffffL) > (current & 0xffffffffL))) {
+        } else if ((timestamp & 0xffffffffL) > (current & 0xffffffffL)) {
         // @formatter:off
         // once per second or less
         // @formatter:on    
-            synchronized (LAST_TIMESTAMP) {
-                if ((timestamp & 0xffffffffL) > (LAST_TIMESTAMP.get() & 0xffffffffL)) {
-                    current = LAST_TIMESTAMP.addAndGet((timestamp & 0xffffffffL) - (LAST_TIMESTAMP.get() & 0xffffffffL));
+            synchronized (UniqueId.class) {
+                current = LAST_TIMESTAMP.get();
+                if ((timestamp & 0xffffffffL) > (current & 0xffffffffL)) {
+                    LAST_TIMESTAMP.set(timestamp & 0xffffffffL);
+                    this.timestamp = timestamp;
+                    this.counter = counter & LOW_ORDER_THREE_BYTES;
+                } else if ((timestamp & 0xffffffffL) == (current & 0xffffffffL)) {
+                    this.timestamp = timestamp;
+                    this.counter = counter & LOW_ORDER_THREE_BYTES;
+                } else if (((current & 0xffffffffL) - (timestamp & 0xffffffffL)) == 1L) {
+                    this.timestamp = (int) current;
+                    this.counter = counter & LOW_ORDER_THREE_BYTES;
+                } else {
+                    this.timestamp = (int) current;
+                    this.counter = NEXT_COUNTER.getAndIncrement() & LOW_ORDER_THREE_BYTES;
                 }
             }
-
         } else {
         // @formatter:off
         //((timestamp & 0xffffffffL) < (current & 0xffffffffL))
         // hardly
         // @formatter:on    
-            synchronized (LAST_TIMESTAMP) {
-                if (((LAST_TIMESTAMP.get() & 0xffffffffL) - (timestamp & 0xffffffffL)) == 1L) {
+            synchronized (UniqueId.class) {
+                current = LAST_TIMESTAMP.get();
+                if (((current & 0xffffffffL) - (timestamp & 0xffffffffL)) == 1L) {
                 // @formatter:off
                 // LAST_TIMESTAMP increased after timestamp generated
                 // @formatter:on  
-                    // Do nothing
+                    
                 } else if (((LAST_TIMESTAMP.get() & 0xffffffffL) - (timestamp & 0xffffffffL)) >= 0x7fffffffL) {
                     // timestamp is in the new round of zero to 0xffffffffL. 0x7fffffffL is half of 0xffffffffL.
-                    // A round is about 69 years, so the gap between last timestamp in the last round and new timestamp
-                    // in this round will not less then 34 years
+                    // A round is about 69 years, so the gap between last timestamp in the last round and new timestamp in this round will not less then 34
+                    // years.
                     LAST_TIMESTAMP.set(timestamp & 0xffffffffL);
-                    current = (timestamp & 0xffffffffL);
                 } else {
-//                    System.err.println(((LAST_TIMESTAMP.get() & 0xffffffffL) - (timestamp & 0xffffffffL)));
-//                    System.err.println(timestamp);
-//                    System.err.println(current);
-//                    System.err.println(LAST_TIMESTAMP.get());
+                    // System.err.println(((LAST_TIMESTAMP.get() & 0xffffffffL) - (timestamp & 0xffffffffL)));
+                    // System.err.println(timestamp);
+                    // System.err.println(current);
+                    // System.err.println(LAST_TIMESTAMP.get());
                     throw new IllegalArgumentException(
                             "The timestamp must not be less then the timestamp last time. (Maybe the machine correct time using time server).");
                 }
             }
+            this.counter = counter & LOW_ORDER_THREE_BYTES;
+            this.timestamp = timestamp;
         }
         if (((machineIdentifier >> 32) & 0xff000000) != 0) {
             throw new IllegalArgumentException("The machine identifier must be between 0 and 28139015110655 (it must fit in six bytes).");
@@ -251,10 +263,8 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
         if (checkCounter && ((counter & 0xff000000) != 0)) {
             throw new IllegalArgumentException("The counter must be between 0 and 16777215 (it must fit in three bytes).");
         }
-        this.timestamp = (int) current;
         this.machineIdentifier = machineIdentifier;
         this.processIdentifier = processIdentifier;
-        this.counter = counter & LOW_ORDER_THREE_BYTES;
     }
 
     /**
@@ -262,7 +272,6 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
      *
      * @param bytes the byte array
      * @return new UniqueId instance
-     * @throws IllegalArgumentException if the byte array is not a valid for an UniqueId
      */
     public static UniqueId fromByteArray(final byte[] bytes) {
         return new UniqueId(bytes);
@@ -273,7 +282,6 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
      *
      * @param hexString the string to convert
      * @return new UniqueId instance
-     * @throws IllegalArgumentException if the string is not a valid hex string representation of an UniqueId
      */
     public static UniqueId fromHexString(final String hexString) {
         return new UniqueId(parseHexString(hexString));
@@ -284,7 +292,6 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
      *
      * @param base64String the string to convert
      * @return new UniqueId instance
-     * @throws IllegalArgumentException if the string is not a valid hex string representation of an UniqueId
      */
     public static UniqueId fromBase64String(final String base64String) {
         return new UniqueId(parseBase64String(base64String));
@@ -294,7 +301,6 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
      * Constructs a new instance from the given byte array
      *
      * @param bytes the byte array
-     * @throws IllegalArgumentException if array is null or not of length 15
      */
     private UniqueId(final byte[] bytes) {
         if (bytes == null) {
@@ -345,7 +351,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
      */
     public long getTimestamp() {
         // To unsigned int
-        return timestamp & 0x0ffffffffL;
+        return timestamp & 0xffffffffL;
     }
 
     /**
@@ -363,7 +369,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
      * @return the process identifier
      */
     public int getProcessIdentifier() {
-        return processIdentifier & 0x0ffff;
+        return processIdentifier & 0x0000ffff;
     }
 
     /**
@@ -391,18 +397,24 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
      * @return the Date
      */
     private Date getDate(long now) {
-        // Timestamp is in this round of zero to 0xffffffffL scope.
+
         if ((timestamp & 0xffffffffL) <= (now / 1000L % 0xffffffffL)) {
+        // @formatter:off
+        // Timestamp is in this round of scope.
+        // @formatter:on
             return new Date((((now / 1000L / 0xffffffffL) * 0xffffffffL + (timestamp & 0xffffffffL)) + now / 1000L / 0xffffffffL) * 1000L);
+
+        } else if (((timestamp & 0xffffffffL) + now / 1000L / 0xffffffffL) - (now / 1000L % 0xffffffffL) >= 0x7fffffffL) {
         // @formatter:off
         // Timestamp is in last round of zero to 0xffffffffL scope.
+        //"+ now / 1000L / 0xffffffffL" is to fix the beginning second (should be 1 but 0) every round starting from second round (the beginning is the first round)
         // @formatter:on
-        } else if (((timestamp & 0xffffffffL) + now / 1000L / 0xffffffffL) - (now / 1000L % 0xffffffffL) >= 0x7fffffffL) {
             return new Date((((now / 1000L / 0xffffffffL) - 1) * 0xffffffffL + (timestamp & 0xffffffffL) + (now / 1000L / 0xffffffffL) - 1) * 1000L);
+
+        } else {
         // @formatter:off
         // Timestamp is in this round of zero to 0xffffffffL scope but bigger then now
         // @formatter:on
-        } else {
             throw new IllegalArgumentException("The timestamp must not be less then the timestamp now. (Maybe the machine correct time using time server).");
         }
 
@@ -419,7 +431,8 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
 
     /**
      * Converts byte array into a hexadecimal string representation.
-     *
+     * 
+     * @param bytes the byte array
      * @return a string
      */
     private static String toHexString(byte[] bytes) {
@@ -450,18 +463,18 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
             return false;
         }
 
-        UniqueId UniqueId = (UniqueId) o;
+        UniqueId uniqueId = (UniqueId) o;
 
-        if (counter != UniqueId.counter) {
+        if (counter != uniqueId.counter) {
             return false;
         }
-        if (machineIdentifier != UniqueId.machineIdentifier) {
+        if (machineIdentifier != uniqueId.machineIdentifier) {
             return false;
         }
-        if (processIdentifier != UniqueId.processIdentifier) {
+        if (processIdentifier != uniqueId.processIdentifier) {
             return false;
         }
-        if (timestamp != UniqueId.timestamp) {
+        if (timestamp != uniqueId.timestamp) {
             return false;
         }
 
@@ -507,8 +520,10 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
         }
     }
 
-    /*
+    /**
      * Creates the machine identifier from the physical MAC address.
+     * 
+     * @return long the machine identifier
      */
     private static long createMachineIdentifier() {
         byte[] mac = null;
@@ -519,7 +534,6 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
                 if (!ni.isLoopback()) {
                     mac = ni.getHardwareAddress();
                 }
-                ;
                 // ?? mac[1] != (byte) 0xff it is from http://johannburkard.de/software/uuid/
                 if (mac != null && mac.length == 6 && mac[1] != (byte) 0xff) {
                     break;
@@ -528,17 +542,24 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
                 }
             }
         } catch (Throwable t) {
+            throw new RuntimeException("Could not get MAC address", t);
         }
         if (mac != null && mac.length == 6 && mac[1] != (byte) 0xff) {
             return bytes2long(mac);
         } else {
-            throw new RuntimeException("MAC address is not correct:" + toHexString(mac));
+            if (null == mac) {
+                throw new RuntimeException("Could not get MAC address!");
+            } else {
+                throw new RuntimeException("MAC address is not correct:" + toHexString(mac));
+            }
         }
 
     }
 
-    /*
+    /**
      * Creates the process identifier.
+     * 
+     * @return short the process identifer
      */
     private static short createProcessIdentifier() {
         short processId;
@@ -557,11 +578,11 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
         return processId;
     }
 
-    /*
+    /**
      * Parse the hexadecimal string (base16 encoding) to byte array
      * 
      * @param s the hexadecimal string
-     * 
+     * @return
      */
     private static byte[] parseHexString(final String s) {
         if (!isValid(s)) {
@@ -575,7 +596,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
         return b;
     }
 
-    /*
+    /**
      * Parse the base64 String to byte array
      * 
      * @param s the base64 string
@@ -588,17 +609,11 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
         return Base64.getUrlDecoder().decode(s);
     }
 
-    /*
-     * Get the timestamp of second from Date instance
-     */
     private static int dateToTimestampSeconds(final Date time) {
         return (int) ((time.getTime() / 1000L) & 0xffffffffL);
     }
 
-    /*
-     * Convert from integer to byte array
-     */
-    private static byte[] int2bytes(int num) {
+    private static byte[] int2bytes(final int num) {
         byte[] bytes = new byte[4];
         for (int ix = 0; ix < 4; ++ix) {
             int offset = 32 - (ix + 1) * 8;
@@ -607,10 +622,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
         return bytes;
     }
 
-    /*
-     * Convert from byte array to integer
-     */
-    private static int bytes2int(byte[] bytes) {
+    private static int bytes2int(final byte[] bytes) {
         if (bytes.length > 4) {
             throw new RuntimeException("byteNum is too long for a int type:" + bytes.length);
         }
@@ -622,10 +634,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
         return num;
     }
 
-    /*
-     * Convert from long to bytes array
-     */
-    private static byte[] long2bytes(long num) {
+    private static byte[] long2bytes(final long num) {
         byte[] bytes = new byte[8];
         for (int ix = 0; ix < 8; ++ix) {
             int offset = 64 - (ix + 1) * 8;
@@ -634,10 +643,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
         return bytes;
     }
 
-    /*
-     * Convert from bytes array to long type
-     */
-    private static long bytes2long(byte[] bytes) {
+    private static long bytes2long(final byte[] bytes) {
         if (bytes.length > 8) {
             throw new RuntimeException("byteNum is too long for a long type:" + bytes.length);
         }

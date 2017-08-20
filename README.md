@@ -5,9 +5,8 @@
 ![Apache 2](http://img.shields.io/badge/license-Apache%202-red.svg)
 [![Join the chat at https://gitter.im/fintx/fintx-identifier](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/fintx/fintx-identifier?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/fintx/fintx-identifier.svg?branch=master)](https://travis-ci.org/fintx/fintx-identifier)
-[![codecov.io](https://codecov.io/github/fintx/fintx-identifier/coverage.svg?branch=master)](https://codecov.io/github/fintx/fintx-identifier?branch=master)
-[![Dependency Status](https://www.versioneye.com/user/projects/598c0fa3368b0838815ce60c/badge.svg?style=flat)](https://www.versioneye.com/user/projects/598c0fa3368b0838815ce60c)
 [![Coverage Status](https://coveralls.io/repos/github/fintx/fintx-identifier/badge.svg)](https://coveralls.io/github/fintx/fintx-identifier)
+[![Dependency Status](https://www.versioneye.com/user/projects/598c0fa3368b0838815ce60c/badge.svg?style=flat)](https://www.versioneye.com/user/projects/598c0fa3368b0838815ce60c)
 
 
 # FinTx[1]

@@ -15,13 +15,8 @@
  */
 package org.fintx.util;
 
-import static org.junit.Assert.*;
 
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -38,40 +33,14 @@ import java.util.UUID;
  */
 public class UniqueIdTest {
     public int count = 2000000;
-    public int threads = 3;
+    public int threads = 4;
     public boolean error = false;
     
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    /**
-     * @throws java.lang.Exception
-     */
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-    }
-
-    /**
-     * @throws java.lang.Exception
-     */
-    @AfterClass
-    public static void tearDownAfterClass() throws Exception {
-    }
-
-    /**
-     * @throws java.lang.Exception
-     */
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    /**
-     * @throws java.lang.Exception
-     */
-    @After
-    public void tearDown() throws Exception {
-    }
+    
 
     @Test
     public void testSingleThread() {
@@ -97,7 +66,6 @@ public class UniqueIdTest {
                         synchronized (list) {
                             list.add(set);
                         }
-                        totalSet.clear();
                     } catch (Throwable t) {
                         t.printStackTrace();
                         error = true;
@@ -118,9 +86,10 @@ public class UniqueIdTest {
             }
 
         }
-        System.err.println("");
+        System.err.println(list.size());
         for (int i = 0; i < threads; i++) {
             totalSet.addAll(list.get(0));
+            list.get(0).clear();
             list.remove(0);
         }
         Assert.assertTrue(totalSet.size() == threads * count);
@@ -266,18 +235,5 @@ public class UniqueIdTest {
         thrown.expect(NullPointerException.class);
         UniqueId.get().compareTo(null);
     }
-    @Test
-    public void testException8() {
-        
-    }
-    @Test
-    public void testException9() {
-        
-    }
-    @Test
-    public void testException0() {
-        
-    }
-    
 
 }
