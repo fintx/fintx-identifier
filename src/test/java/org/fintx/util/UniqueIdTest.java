@@ -32,7 +32,7 @@ import java.util.UUID;
  *
  */
 public class UniqueIdTest {
-    public int count = 100000;
+    public int count = 2000000;
     public int threads = 4;
     public boolean error = false;
     

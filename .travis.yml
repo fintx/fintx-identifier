@@ -9,8 +9,8 @@ jdk:
 
 env:
   global:
-    - JAVA_OPTS="-Xmx2G"
-    - MAVEN_OPTS="-Xmx2G"
+    - JAVA_OPTS="-Xmx4G"
+    - MAVEN_OPTS="-Xmx4G"
 
 before_script:
   - echo $JAVA_OPTS
