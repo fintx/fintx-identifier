@@ -15,6 +15,9 @@ env:
 before_script:
   - echo $JAVA_OPTS
   - echo $MAVEN_OPTS
+  
+script:
+  -mvn -e test
 
 after_success:
   - mvn coveralls:report -Ptravis
