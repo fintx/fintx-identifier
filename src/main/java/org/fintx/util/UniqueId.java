@@ -35,7 +35,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * Consists of 15 bytes, divided as follows:
  * </p>
  * <table border="1">
- * <caption>ObjectID layout</caption>
+ * <caption>UniqueID layout</caption>
  * <tr>
  * <td>0</td>
  * <td>1</td>
