@@ -35,7 +35,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * Consists of 15 bytes, divided as follows:
  * </p>
  * <table border="1">
- * <caption>UniqueID layout</caption>
+ * <caption>UniqueId layout</caption>
  * <tr>
  * <td>0</td>
  * <td>1</td>
@@ -502,7 +502,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
 
         byte[] byteArray = toByteArray();
         byte[] otherByteArray = other.toByteArray();
-        for (int i = 0; i < 12; i++) {
+        for (int i = 0; i < 15; i++) {
             if (byteArray[i] != otherByteArray[i]) {
                 return ((byteArray[i] & 0xff) < (otherByteArray[i] & 0xff)) ? -1 : 1;
             }
