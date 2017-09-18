@@ -57,7 +57,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * <td colspan="4">time</td>
  * <td colspan="6">machine</td>
  * <td colspan="2">pid</td>
- * <td colspan="3">inc</td>
+ * <td colspan="3">counter</td>
  * </tr>
  * </table>
  *
