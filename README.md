@@ -19,6 +19,19 @@ FinTx is an open source group focus on financial technologies.
 
 fintx-identifier is for generating unique id in high performance and distribution environment. It extends the mongodb's ObjectId that using full MAC address to prevent the duplicated Id. It does not depend on the seeds like snowflake id generator. It can generate both 20 charachers base64 URL safe id (recommend) and 30 characters hex character id. Both id characters are in sequence that not random.
 
+## Structure
+
+<p>Consists of 15 bytes, divided as follows:</p>
+<table border="1">
+<caption>UniqueId layout</caption>
+<tr>
+<td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td><td>14</td>
+</tr>
+<tr>
+<td colspan="4">time</td><td colspan="6">machine</td><td colspan="2">pid</td><td colspan="3">counter</td>
+</tr>
+</table>
+
 ## Limitations
 1. ProcessId on os could not bigger then 65535 (the default max value in most linux OS).    
 2. Only in one bundle of same JVM when using OSGI.    
