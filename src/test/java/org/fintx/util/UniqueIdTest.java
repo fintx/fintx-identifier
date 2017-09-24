@@ -43,22 +43,13 @@ public class UniqueIdTest {
 
     @Test
     public void testSingleThread() {
-        /*use reflect to test unreachable methods
-        try {
-            Method getDate_long = UniqueId.class.getMethod("getDate", new Class[] { long.class });
-
-            Date result =(Date) getDate_long.invoke(null, new Object[] { 123 });
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (SecurityException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        */
+        /*
+         * use reflect to test unreachable methods try { Method getDate_long = UniqueId.class.getMethod("getDate", new Class[] { long.class });
+         * 
+         * Date result =(Date) getDate_long.invoke(null, new Object[] { 123 }); } catch (IllegalAccessException | IllegalArgumentException |
+         * InvocationTargetException e) { // TODO Auto-generated catch block e.printStackTrace(); } catch (NoSuchMethodException e) { // TODO Auto-generated
+         * catch block e.printStackTrace(); } catch (SecurityException e) { // TODO Auto-generated catch block e.printStackTrace(); }
+         */
         for (int i = 0; i < threads; i++) {
             doTest().clear();
         }
@@ -131,7 +122,6 @@ public class UniqueIdTest {
             uniqueId30 = UniqueId.get().toHexString();
             Assert.assertTrue("not 30 character id:" + uniqueId30, 30 == uniqueId30.length());
         }
-        
 
         // check performance
         long begin = System.currentTimeMillis();

@@ -105,7 +105,7 @@ public final class UniqueId implements Comparable<UniqueId>, Serializable {
     public static UniqueId get() {
         return new UniqueId(dateToTimestampSeconds(new Date()), MACHINE_IDENTIFIER, PROCESS_IDENTIFIER, NEXT_COUNTER.getAndIncrement(), false);
     }
-    
+
     /**
      * Gets a new object id.
      *
