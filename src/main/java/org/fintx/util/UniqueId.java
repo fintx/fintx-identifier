@@ -73,8 +73,8 @@ import java.util.concurrent.atomic.AtomicLong;
  * </p>
  *
  */
-1检查long int 溢出的问题
-2timestamp是否可以进一步缩短（考虑base64问题移动6bit(2^6=64)省一个字符，重复的时间缩短到1年多（69/64=?））
+//TODO 1检查long int 溢出的问题
+//TODO 2timestamp是否可以进一步缩短（考虑base64问题移动6bit(2^6=64)省一个字符，重复的时间缩短到1年多（69/64=?））
 public final class UniqueId implements Comparable<UniqueId>, Serializable {
 
     private static final long serialVersionUID = 3670079982654483072L;
