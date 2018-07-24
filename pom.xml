@@ -136,7 +136,48 @@
 					</excludes>
 				</configuration>
 			</plugin>
-
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>3.1.1</version>
+				<executions>
+					<execution>
+						<id>copy</id>
+						<phase>package</phase>
+						<goals>
+							<goal>tree</goal>
+							<goal>analyze-only</goal>
+						</goals>
+						<configuration>
+							<!-- artifactItems> <artifactItem> <groupId>[ groupId ]</groupId> 
+								<artifactId>[ artifactId ]</artifactId> <version>[ version ]</version> <type>[ 
+								packaging ]</type> <classifier> [classifier - optional] </classifier> <overWrite>[ 
+								true or false ]</overWrite> <outputDirectory>[ output directory ]</outputDirectory> 
+								<destFileName>[ filename ]</destFileName> </artifactItem> </artifactItems> -->
+							<!-- other configurations here -->
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.owasp</groupId>
+				<artifactId>dependency-check-maven</artifactId>
+				<version>3.2.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<autoUpdate>true</autoUpdate>
+					<!-- build should be failed if a CVSS score equal to or above a specified 
+						level(0-10) -->
+					<failBuildOnCVSS>3</failBuildOnCVSS>
+					<failOnError>true</failOnError>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
@@ -159,7 +200,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<failFast>true</failFast>
+					<failFast>false</failFast>
 					<rules>
 						<requireMavenVersion>
 							<version>[3.0.3,)</version>
@@ -175,15 +216,15 @@
 								<exclude>log4j:log4j</exclude>
 								<exclude>org.slf4j:slf4j-log4j12</exclude>
 								<exclude>org.slf4j:slf4j-log4j13</exclude>
-								<!-- logback is not recommend -->
+								<!-- logback is not recommend use log4j2 -->
 								<exclude>ch.qos.logback:*</exclude>
 								<exclude>org.springframework:*:[,5.0.0.RELEASE]:jar</exclude>
 								<exclude>commons-beanutils:commons-beanutils:[,1.8.3]:jar</exclude>
 							</excludes>
 							<includes>
 								<include>junit:junit:*:jar:test</include>
-								<include>org.apache.logging.log4j:log4j-core:[2.11.0,]</include>
-								<include>org.apache.logging.log4j:log4j-slf4j-impl:[2.11.0,]</include>
+								<include>org.apache.logging.log4j:log4j-core:[2.10.0,]</include>
+								<include>org.apache.logging.log4j:log4j-slf4j-impl:[2.10.0,]</include>
 							</includes>
 							<message>Use log4j2 and spring above 5.0.0</message>
 						</bannedDependencies>
@@ -212,6 +253,7 @@
 								<ignoreClass>org.apache.commons.beanutils.*</ignoreClass>
 								<ignoreClass>org.apache.xmlbeans.xml.stream.*</ignoreClass>
 								<ignoreClass>org.xml.sax.*</ignoreClass>
+								<ignoreClass>io.netty.*</ignoreClass>
 							</ignoreClasses>
 							<message>[ERROR] [Enforcer Rules] find DuplicateClasses</message>
 						</banDuplicateClasses>
@@ -228,7 +270,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.0</version>
+				<version>0.8.1</version>
 				<executions>
 					<execution>
 						<goals>
@@ -245,12 +287,70 @@
 				</executions>
 			</plugin>
 			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<!-- specify version remove the version warning -->
+				<version>3.0.5</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
+					<language>java</language>
+					<verbose>true</verbose>
+					<linkXref>true</linkXref>
+					<targetJdk>${java.version}</targetJdk>
+					<failOnViolation>false</failOnViolation>
+					<failsOnError>true</failsOnError>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-pmd-plugin</artifactId>
+				<version>3.10.0</version>
+				<dependencies>
+					<dependency>
+						<groupId>commons-beanutils</groupId>
+						<artifactId>commons-beanutils</artifactId>
+						<version>1.9.3</version>
+					</dependency>
+					<dependency>
+						<groupId>org.dom4j</groupId>
+						<artifactId>dom4j</artifactId>
+						<version>2.1.1</version>
+					</dependency>
+				</dependencies>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+							<goal>cpd-check</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
+					<language>java</language>
+					<verbose>true</verbose>
+					<linkXref>true</linkXref>
+					<rulesets>
+						<ruleset>pmd.xml</ruleset>
+					</rulesets>
+					<targetJdk>${java.version}</targetJdk>
+					<failOnViolation>false</failOnViolation>
+					<failsOnError>true</failsOnError>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
 				<version>3.0.0</version>
 				<executions>
 					<execution>
-						<id>validate</id>
 						<goals>
 							<goal>check</goal>
 						</goals>
@@ -262,34 +362,22 @@
 					<consoleOutput>true</consoleOutput>
 					<failsOnError>true</failsOnError>
 					<linkXRef>true</linkXRef>
+					<failOnViolation>false</failOnViolation>
+					<failsOnError>true</failsOnError>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-pmd-plugin</artifactId>
-				<version>3.10.0</version>
-				<configuration>
-					<sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
-					<language>java</language>
-					<verbose>true</verbose>
-					<linkXref>true</linkXref>
-					<rulesets>
-						<ruleset>pmd.xml</ruleset>
-					</rulesets>
-					<targetJdk>${java.version}</targetJdk>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>findbugs-maven-plugin</artifactId>
-				<!-- specify version remove the version warning -->
-				<version>3.0.5</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jdeps-plugin</artifactId>
 				<!-- specify version remove the version warning -->
 				<version>3.1.1</version>
+				<executions>
+					<execution>
+						<phase>process-classes</phase>
+						<goals>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -392,6 +480,34 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jdeps-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>3.1.1</version>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>analyze-report</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+			<!-- Owasp security check -->
+			<plugin>
+				<groupId>org.owasp</groupId>
+				<artifactId>dependency-check-maven</artifactId>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<!-- only aggregate supported -->
+							<report>aggregate</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+				<configuration>
+					<name>Dependency Security Check report</name>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
