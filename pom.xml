@@ -273,17 +273,24 @@
 				<version>0.8.1</version>
 				<executions>
 					<execution>
-						<goals>
-							<goal>prepare-agent</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>report</id>
-						<phase>test</phase>
-						<goals>
-							<goal>report</goal>
-						</goals>
-					</execution>
+          				      <id>agent-for-ut</id>
+          				      <goals>
+         				         <goal>prepare-agent</goal>
+         				       </goals>
+        				      </execution>
+       				       <execution>
+       				         <id>agent-for-it</id>
+       				         <goals>
+      				            <goal>prepare-agent-integration</goal>
+      				          </goals>
+       				       </execution>
+      				        <execution>
+       				         <id>jacoco-site</id>
+        				        <phase>verify</phase>
+       				         <goals>
+        				          <goal>report</goal>
+       				         </goals>
+      				        </execution>
 				</executions>
 			</plugin>
 			<plugin>
