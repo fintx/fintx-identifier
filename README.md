@@ -36,7 +36,7 @@ fintx-identifier is for generating unique id in high performance and distributio
 1. ProcessId on os could not bigger then 65535 (the default max value in most linux OS).    
 2. Only in one bundle of same JVM when using OSGI.    
 3. Id requirement could not more then about 16777215 per second per JVM.    
-4. Maybe it will generate duplicated id every (2^32-1)/(60*60*24*365)≈136.19 years with same machine and same process(no possible).
+4. Maybe it will generate duplicated id every (2^32 - 1)/(60 * 60 * 24 * 365)≈136.19 years with same machine and same process(no possible).
 
 ## Using
 This is something that you get for free just by adding the following dependency inside your project:
